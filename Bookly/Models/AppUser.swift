@@ -6,12 +6,14 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 struct AppUser: Identifiable, Codable, Hashable {
     
-    var id: String
+    @DocumentID var id: String?
     let email: String
-    var displayName: String
+    let firstName: String
+    let lastName: String
     var isActive: Bool = true
 
 }

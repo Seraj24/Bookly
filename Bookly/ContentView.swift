@@ -10,17 +10,29 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
+    
+    @ObservedObject var auth = AuthService.shared
+    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
     private var items: FetchedResults<Item>
 
     var body: some View {
-        NavigationStack {
-            SignInView()
+        Group {
+            if auth.currentUser != nil {
+                NavigationStack {
+                    HomeView()
+                }
+            } else {
+                NavigationStack {
+                    SignInView()
+                }
+                
+            }
+            
+            
         }
-        
     }
 
     private func addItem() {

@@ -11,6 +11,9 @@ import Combine
 final class SignInViewModel: ObservableObject {
     @Published var email = ""
     @Published var password = ""
+    @Published var errorMessage: String?
+    
+    private var auth = AuthService.shared
     
     private let formValidator = FormValidator()
     
@@ -20,8 +23,13 @@ final class SignInViewModel: ObservableObject {
     }
     
     func signInTapped() {
-        
+        auth.login(email: email, password: password) { result in
+            switch result {
+            case .success:
+                self.errorMessage = nil
+            case .failure(let err):
+                self.errorMessage = err.localizedDescription
+            }
+        }
     }
-    
-    
 }

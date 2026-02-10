@@ -7,7 +7,7 @@
 
 import Foundation
 
-//These are just temp models becuase I am trying to fix some issues with CoreData
+// Temp Model
 enum Category: String, CaseIterable, Identifiable {
     case hotels
     case flights

@@ -10,10 +10,19 @@ import Combine
 
 final class AccountViewModel: ObservableObject {
     
-    let appUser: AppUser
+    private var auth = AuthService.shared
     
-    init(appUser: AppUser) {
-        self.appUser = appUser
+    var appUser: AppUser?
+    
+    init() {
+        appUser = auth.currentUser
     }
+    
+    func logOut() {
+        auth.signOut()
+    }
+    
+    
+    
 }
 

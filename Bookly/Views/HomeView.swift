@@ -40,8 +40,8 @@ struct HomeView: View {
             case .hotels(let destination):
                 HotelsView(destination: destination)
 
-            case .account(let user):
-                AccountView(appUser: user)
+            case .account:
+                AccountView()
             }
         }
     }
@@ -61,8 +61,7 @@ struct HomeView: View {
             Spacer()
             
             Button {
-                let mockUser = AppUser(id: "1", email: "admin@bookly.com", displayName: "Test User")
-                vm.route = .account(mockUser)
+                vm.route = .account
             } label: {
                 Image(systemName: "person.circle.fill")
                     .font(.system(size: 34))
@@ -263,7 +262,7 @@ struct HomeView: View {
 
 enum HomeRoute: Hashable, Identifiable {
     case hotels(destination: String)
-    case account(AppUser)
+    case account
 
     var id: Self { self }
 }

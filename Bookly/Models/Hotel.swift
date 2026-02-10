@@ -7,6 +7,9 @@
 
 import Foundation
 
+
+// Temp Model
+
 struct Hotel: Identifiable {
     let id: UUID = UUID()
     let name: String

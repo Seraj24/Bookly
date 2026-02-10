@@ -69,9 +69,9 @@ struct SignUpView: View {
             VStack {
                 
                 Button {
-                    //TODO
+                    vm.CreateAccount()
                 } label: {
-                    Label("Sign In", systemImage: "airplane.departure")
+                    Label("Sign Up", systemImage: "airplane.departure")
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
                 }
@@ -79,6 +79,14 @@ struct SignUpView: View {
                 .buttonStyle(.borderedProminent)
                 .disabled(!vm.canSubmit)
                 .opacity(vm.canSubmit ? 1 : 0.6)
+                
+                Text(vm.errorMessage ?? "")
+                    .foregroundColor(.red)
+                
+                Text(vm.createdSuccessfully ? "Account Created Successfully! You can now head to the Sign In page." : "")
+                    .foregroundColor(.green)
+                
+                
                 
                 
                 HStack(spacing: 6) {

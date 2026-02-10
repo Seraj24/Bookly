@@ -67,6 +67,9 @@ struct SignInView: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(!vm.canSubmit)
                     .opacity(vm.canSubmit ? 1 : 0.6)
+                    
+                    Text(vm.errorMessage ?? "")
+                        .foregroundColor(.red)
 
 
                     NavigationLink("Continue as guest") {

@@ -7,6 +7,8 @@
 
 import Foundation
 
+
+// Temp Model
 struct Deal: Identifiable {
     let id: UUID = UUID()
     let title: String

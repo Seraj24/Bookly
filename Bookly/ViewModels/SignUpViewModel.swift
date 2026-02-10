@@ -15,6 +15,10 @@ final class SignUpViewModel: ObservableObject {
     @Published var email = ""
     @Published var password = ""
     @Published var showPassword = false
+    @Published var errorMessage: String?
+    @Published var createdSuccessfully = false
+    
+    private var auth = AuthService.shared
     
     private let formValidator = FormValidator()
     
@@ -22,5 +26,18 @@ final class SignUpViewModel: ObservableObject {
         
         formValidator.validateSignUp(firstName: firstName, lastName: lastName, email: email, password: password)
         
+    }
+    
+    func CreateAccount() {
+        
+        auth.signUp(firstName: firstName, lastName: lastName, email: email, passwrod: password) { result in
+            switch result {
+            case .success(let success):
+                self.errorMessage = nil
+                self.createdSuccessfully = true
+            case .failure(let failure):
+                self.errorMessage = failure.localizedDescription
+            }
+        }
     }
 }
