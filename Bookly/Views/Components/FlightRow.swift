@@ -35,17 +35,17 @@ struct FlightRow: View {
                 )
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(flight.airline)
+                Text(flight.airline?.airlineName ?? "Unknown Airline")
                     .font(.headline)
 
-                Text(flight.cabin)
+                Text(primaryCabinText)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
 
-            Text("$\(flight.price)")
+            Text(priceText)
                 .font(.title3)
                 .fontWeight(.bold)
         }
@@ -54,11 +54,11 @@ struct FlightRow: View {
     private var middleRow: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text(flight.departureTime)
+                Text(timeText(from: flight.departureTime))
                     .font(.title3)
                     .fontWeight(.semibold)
 
-                Text(flight.fromCity)
+                Text(airportDisplayName(flight.departureAirport))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -66,7 +66,7 @@ struct FlightRow: View {
             Spacer()
 
             VStack(spacing: 6) {
-                Text(flight.duration)
+                Text(durationText)
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
@@ -88,7 +88,7 @@ struct FlightRow: View {
                 }
                 .foregroundStyle(.secondary)
 
-                Text(flight.stopsText)
+                Text("Flight")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -96,11 +96,11 @@ struct FlightRow: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 4) {
-                Text(flight.arrivalTime)
+                Text(timeText(from: flight.arrivalTime))
                     .font(.title3)
                     .fontWeight(.semibold)
 
-                Text(flight.toCity)
+                Text(airportDisplayName(flight.arrivalAirport))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -109,7 +109,7 @@ struct FlightRow: View {
 
     private var bottomRow: some View {
         HStack {
-            Label(flight.date, systemImage: "calendar")
+            Label(dateText, systemImage: "calendar")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
@@ -121,7 +121,44 @@ struct FlightRow: View {
                 .foregroundStyle(.blue)
         }
     }
-}
-#Preview {
-    //FlightRow(nil)
+    
+    private var primaryCabinText: String {
+        cheapestCabin?.cabinClass ?? "Cabin not available"
+    }
+    
+    private var priceText: String {
+        guard let cabin = cheapestCabin else { return "N/A" }
+        return String(format: "$%.0f", cabin.price)
+    }
+    
+    private var durationText: String {
+        let totalMinutes = Int(flight.duration) / 60
+        let hours = totalMinutes / 60
+        let minutes = totalMinutes % 60
+        return "\(hours)h \(minutes)m"
+    }
+    
+    private var dateText: String {
+        guard let departureTime = flight.departureTime else { return "Unknown date" }
+        return departureTime.formatted(date: .abbreviated, time: .omitted)
+    }
+    
+    private var cheapestCabin: Cabin? {
+        let cabinsSet = flight.cabins as? Set<Cabin> ?? []
+        return cabinsSet.sorted { $0.price < $1.price }.first
+    }
+    
+    private func timeText(from date: Date?) -> String {
+        guard let date else { return "--:--" }
+        return date.formatted(date: .omitted, time: .shortened)
+    }
+    
+    private func airportDisplayName(_ airport: Airport?) -> String {
+        guard let airport else { return "Unknown airport" }
+        
+        let code = airport.code ?? ""
+        let name = airport.name ?? "Unknown airport"
+        
+        return code.isEmpty ? name : code
+    }
 }

@@ -7,22 +7,43 @@
 
 import Foundation
 import Combine
+import CoreData
 
 final class AccountViewModel: ObservableObject {
     
-    private var auth = AuthService.shared
+    private let auth = AuthService.shared
     
-    var appUser: AppUser?
+    private var holder: BooklyHolder?
+    private var context: NSManagedObjectContext?
+    
+    @Published var appUser: AppUser?
     
     init() {
-        appUser = auth.currentUser
+        self.appUser = auth.currentUser
+    }
+    
+    func configure(holder: BooklyHolder, context: NSManagedObjectContext) {
+        self.holder = holder
+        self.context = context
+        
     }
     
     func logOut() {
-        auth.signOut()
+        
+        guard let holder, let context else { return }
+        
+        let result = auth.signOut(holder: holder, context: context)
+        
+        switch result {
+        case .success:
+            appUser = nil
+        case .failure(let error):
+            print("Logout failed: \(error.localizedDescription)")
+        }
     }
     
-    
-    
+    func refreshUser() {
+        appUser = auth.currentUser
+    }
 }
 

@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct FlightDetailsView: View {
-    let flight: Flight
+    @StateObject private var vm: FlightDetailsViewModel
+    
+    init(flight: Flight) {
+        _vm = StateObject(wrappedValue: FlightDetailsViewModel(flight: flight))
+    }
     
     var body: some View {
         ScrollView {
@@ -38,24 +42,24 @@ struct FlightDetailsView: View {
                     )
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(flight.airline)
+                    Text(vm.airlineText)
                         .font(.headline)
                     
-                    Text(flight.cabin)
+                    Text(vm.cabinText)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
                 
                 Spacer()
                 
-                Text("$\(flight.price)")
+                Text(vm.priceText)
                     .font(.title3)
                     .fontWeight(.bold)
             }
             
             Divider()
             
-            Text("A clean and comfortable option for your trip.")
+            Text(vm.descriptionText)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -68,11 +72,11 @@ struct FlightDetailsView: View {
         VStack(spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(flight.departureTime)
+                    Text(vm.departureTimeText)
                         .font(.title2)
                         .fontWeight(.bold)
                     
-                    Text(flight.fromCity)
+                    Text(vm.fromCityText)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -80,7 +84,7 @@ struct FlightDetailsView: View {
                 Spacer()
                 
                 VStack(spacing: 6) {
-                    Text(flight.duration)
+                    Text(vm.durationText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     
@@ -104,7 +108,7 @@ struct FlightDetailsView: View {
                     }
                     .foregroundStyle(.secondary)
                     
-                    Text(flight.stopsText)
+                    Text(vm.stopsText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -113,11 +117,11 @@ struct FlightDetailsView: View {
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text(flight.arrivalTime)
+                    Text(vm.arrivalTimeText)
                         .font(.title2)
                         .fontWeight(.bold)
                     
-                    Text(flight.toCity)
+                    Text(vm.toCityText)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -131,7 +135,7 @@ struct FlightDetailsView: View {
                 
                 Spacer()
                 
-                Text(flight.date)
+                Text(vm.dateText)
                     .foregroundStyle(.primary)
             }
         }
@@ -142,13 +146,13 @@ struct FlightDetailsView: View {
     
     private var detailsCard: some View {
         VStack(spacing: 14) {
-            detailsRow(title: "Airline", value: flight.airline, systemImage: "building.2")
+            detailsRow(title: "Airline", value: vm.airlineText, systemImage: "building.2")
             Divider()
-            detailsRow(title: "Cabin", value: flight.cabin, systemImage: "seat.side.right")
+            detailsRow(title: "Cabin", value: vm.cabinText, systemImage: "seat.side.right")
             Divider()
-            detailsRow(title: "Duration", value: flight.duration, systemImage: "clock")
+            detailsRow(title: "Duration", value: vm.durationText, systemImage: "clock")
             Divider()
-            detailsRow(title: "Stops", value: flight.stopsText, systemImage: "point.topleft.down.curvedto.point.bottomright.up")
+            detailsRow(title: "Stops", value: vm.stopsText, systemImage: "point.topleft.down.curvedto.point.bottomright.up")
         }
         .padding()
         .background(Color(.systemBackground))
@@ -163,7 +167,7 @@ struct FlightDetailsView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     
-                    Text("$\(flight.price)")
+                    Text(vm.priceText)
                         .font(.title2)
                         .fontWeight(.bold)
                 }
@@ -196,8 +200,4 @@ struct FlightDetailsView: View {
                 .multilineTextAlignment(.trailing)
         }
     }
-}
-
-#Preview {
-    //FlightDetailsView()
 }

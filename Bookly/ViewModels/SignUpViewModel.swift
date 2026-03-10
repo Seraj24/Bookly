@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import CoreData
 
 final class SignUpViewModel: ObservableObject {
     
@@ -22,10 +23,21 @@ final class SignUpViewModel: ObservableObject {
     
     private var auth = AuthService.shared
     
+    private var holder: BooklyHolder?
+    private var context: NSManagedObjectContext?
+    
+    
     private let formValidator = FormValidator()
+
     
     func errorMessage(for field: SignUpField) -> String? {
             errors[field]
+    }
+    
+    func configure(holder: BooklyHolder, context: NSManagedObjectContext) {
+        self.holder = holder
+        self.context = context
+        
     }
     
     var canSubmit: Bool {
@@ -43,18 +55,31 @@ final class SignUpViewModel: ObservableObject {
             email: email,
             password: password
         )
-                
+        
         errors = validationErrors
-                
+        
         guard validationErrors.isEmpty else { return }
         
-        auth.signUp(firstName: firstName, lastName: lastName, email: email, passwrod: password) { result in
-            switch result {
-            case .success(let success):
-                self.errorMessage = nil
-                self.createdSuccessfully = true
-            case .failure(let failure):
-                self.errorMessage = "Failed to create an account. Please check your input and then try again."
+        guard let holder, let context else { return }
+        
+        
+        auth.signUp(
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password,
+            holder: holder,
+            context: context
+        ) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self.errorMessage = nil
+                    self.createdSuccessfully = true
+                case .failure(let err):
+                    self.createdSuccessfully = false
+                    self.errorMessage = err.localizedDescription
+                }
             }
         }
     }

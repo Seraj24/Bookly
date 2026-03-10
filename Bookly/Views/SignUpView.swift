@@ -9,7 +9,11 @@ import SwiftUI
 
 struct SignUpView: View {
     
+    @EnvironmentObject private var holder: BooklyHolder
+    @Environment(\.managedObjectContext) private var context
+    
     @StateObject private var vm: SignUpViewModel = SignUpViewModel()
+
     
     var body: some View {
         ScrollView {
@@ -31,6 +35,9 @@ struct SignUpView: View {
         .background(Color("BackgroundColor").ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .navigationBar)
+        .onAppear {
+            vm.configure(holder: holder, context: context)
+        }
     }
     
     private var headerSection: some View {

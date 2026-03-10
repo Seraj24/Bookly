@@ -8,21 +8,27 @@
 import Foundation
 import Combine
 
-final class HotelsViewModel: ObservableObject {
+final class HotelsResultsViewModel: ObservableObject {
+    
     @Published private(set) var hotels: [Hotel] = []
-
-    private let allHotels: [Hotel]
-
-    init(destination: String, allHotels: [Hotel] = ExampleHotels.all) {
+    
+    private var allHotels: [Hotel] = []
+    
+    init(destination: String, allHotels: [Hotel] = []) {
         self.allHotels = allHotels
+        applyFilter(destination: destination)
+    }
+    
+    func setHotels(_ hotels: [Hotel], destination: String) {
+        self.allHotels = hotels
         applyFilter(destination: destination)
     }
 
     func applyFilter(destination: String) {
         
         let loweredDestination = destination
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
         
         guard !loweredDestination.isEmpty else {
             hotels = allHotels
@@ -30,7 +36,9 @@ final class HotelsViewModel: ObservableObject {
         }
 
         hotels = allHotels.filter {
-            $0.city.lowercased().contains(loweredDestination)
+            ($0.destination?.city ?? "")
+                .lowercased()
+                .contains(loweredDestination)
         }
     }
 }

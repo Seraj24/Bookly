@@ -13,6 +13,7 @@ final class FlightsResultsViewModel: ObservableObject {
     @Published var isLoading = false
 
     let request: FlightSearchRequest
+    private var allFlights: [Flight] = []
 
     var titleText: String {
         "\(request.fromCity) → \(request.toCity)"
@@ -22,55 +23,59 @@ final class FlightsResultsViewModel: ObservableObject {
         "\(flights.count) flight\(flights.count == 1 ? "" : "s") found"
     }
 
-    init(request: FlightSearchRequest) {
+    init(request: FlightSearchRequest, allFlights: [Flight] = []) {
         self.request = request
+        self.allFlights = allFlights
+        loadFlights()
+    }
+    
+    func setFlights(_ flights: [Flight]) {
+        self.allFlights = flights
         loadFlights()
     }
 
     func loadFlights() {
         isLoading = true
 
-        let formattedDate = request.departureDate.formatted(date: .abbreviated, time: .omitted)
+        let fromCode = airportCode(from: request.fromCity)
+        let toCode = airportCode(from: request.toCity)
 
-        flights = [
-            Flight(
-                airline: "Air Canada",
-                fromCity: request.fromCity,
-                toCity: request.toCity,
-                departureTime: "08:30",
-                arrivalTime: "11:45",
-                date: formattedDate,
-                duration: "3h 15m",
-                price: 420,
-                cabin: "Economy",
-                stopsText: "Non-stop"
-            ),
-            Flight(
-                airline: "Porter",
-                fromCity: request.fromCity,
-                toCity: request.toCity,
-                departureTime: "10:10",
-                arrivalTime: "14:00",
-                date: formattedDate,
-                duration: "3h 50m",
-                price: 365,
-                cabin: "Economy",
-                stopsText: "1 stop"
-            ),
-            Flight(
-                airline: "WestJet",
-                fromCity: request.fromCity,
-                toCity: request.toCity,
-                departureTime: "18:20",
-                arrivalTime: "21:35",
-                date: formattedDate,
-                duration: "3h 15m",
-                price: 510,
-                cabin: "Premium Economy",
-                stopsText: "Non-stop"
-            )
-        ]
+        flights = allFlights.filter { flight in
+            let departureCode = (flight.departureAirport?.code ?? "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased()
+            
+            let arrivalCode = (flight.arrivalAirport?.code ?? "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased()
+
+            return departureCode == fromCode && arrivalCode == toCode
+        }
 
         isLoading = false
+    }
+
+    private func airportCode(from text: String) -> String {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard let open = trimmed.lastIndex(of: "("),
+              let close = trimmed.lastIndex(of: ")"),
+              open < close else {
+            return trimmed.lowercased()
+        }
+        
+        let code = trimmed[trimmed.index(after: open)..<close]
+        return code.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    }
+    
+    private func formattedAirportText(for airport: Airport?) -> String {
+        let name = airport?.name ?? ""
+        let code = airport?.code ?? ""
+        
+        if !name.isEmpty && !code.isEmpty {
+            return "\(name) (\(code))"
+        }
+        
+        return name
     }
 }

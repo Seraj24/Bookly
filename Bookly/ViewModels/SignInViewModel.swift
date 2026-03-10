@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import CoreData
 
 final class SignInViewModel: ObservableObject {
     @Published var email = ""
@@ -15,21 +16,48 @@ final class SignInViewModel: ObservableObject {
     
     private var auth = AuthService.shared
     
-    private let formValidator = FormValidator()
+    private var holder: BooklyHolder?
+    private var context: NSManagedObjectContext?
+        
     
+    private let formValidator = FormValidator()
+      
     
     var canSubmit: Bool {
         formValidator.validateSignIn(email: email, password: password)
     }
     
+    func configure(holder: BooklyHolder, context: NSManagedObjectContext) {
+        self.holder = holder
+        self.context = context
+        
+    }
+    
+    func continueAsGuest() {
+        auth.isGuest = true
+    }
+    
     func signInTapped() {
-        auth.login(email: email, password: password) { result in
-            switch result {
-            case .success:
-                self.errorMessage = nil
-            case .failure(let err):
-                self.errorMessage = err.localizedDescription
+        
+        guard let holder, let context else { return }
+        
+        auth.login(
+            email: email,
+            password: password,
+            holder: holder,
+            context: context
+        )
+        { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self.errorMessage = nil
+                case .failure(let err):
+                    self.errorMessage = "Invalid Email or Password"
+                    
+                }
             }
+            
         }
     }
 }

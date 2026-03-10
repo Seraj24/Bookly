@@ -11,11 +11,14 @@ struct HotelsResultsView: View {
     
     let destination: String
     
-    @StateObject private var vm: HotelsViewModel
+    @EnvironmentObject private var holder: BooklyHolder
+    
+    @StateObject private var vm: HotelsResultsViewModel
     
     init(destination: String) {
         self.destination = destination
-        _vm = StateObject(wrappedValue: HotelsViewModel(destination: destination))
+        _vm = StateObject(wrappedValue: HotelsResultsViewModel(destination: destination))
+        
     }
     
     var body: some View {
@@ -47,6 +50,9 @@ struct HotelsResultsView: View {
         }
         .navigationTitle("Hotels")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            vm.setHotels(holder.hotels, destination: destination)
+        }
     }
 }
     
@@ -67,15 +73,14 @@ private struct HotelRow: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 
-                Text(hotel.name)
+                Text(hotel.name ?? "Unknown Hotel")
                     .font(.headline)
                 
-                Text(hotel.city)
+                Text(hotel.destination?.city ?? "Unknown City")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 
                 HStack {
-                    
                     Label(
                         String(format: "%.1f", hotel.rating),
                         systemImage: "star.fill"
@@ -84,18 +89,16 @@ private struct HotelRow: View {
                     .foregroundStyle(.secondary)
                     
                     Spacer()
-                    
-                    Text("$\(hotel.pricePerNight)/night")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
                 }
             }
         }
         .padding(.vertical, 4)
     }
-    
 }
 
 #Preview {
+    /*
     HotelsResultsView(destination: "Montreal")
+        .environmentObject(BooklyHolder(PersistenceController.shared.container.viewContext))
+     */
 }

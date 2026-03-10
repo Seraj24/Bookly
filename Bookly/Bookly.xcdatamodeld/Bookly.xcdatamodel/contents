@@ -1,10 +1,56 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24512" systemVersion="24G419" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Airline" representedClassName="Airline" syncable="YES" codeGenerationType="class">
+        <attribute name="airlineName" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="flights" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="airline" inverseEntity="Flight"/>
+    </entity>
+    <entity name="Airport" representedClassName="Airport" syncable="YES" codeGenerationType="class">
+        <attribute name="code" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="arrivalFlights" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="arrivalAirport" inverseEntity="Flight"/>
+        <relationship name="departingFlights" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="departureAirport" inverseEntity="Flight"/>
+        <relationship name="destination" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Destination" inverseName="airports" inverseEntity="Destination"/>
+    </entity>
     <entity name="AppUser" representedClassName="AppUser" syncable="YES" codeGenerationType="class">
         <attribute name="email" optional="YES" attributeType="String"/>
         <attribute name="firstName" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="isActive" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="lastName" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="Cabin" representedClassName="Cabin" syncable="YES" codeGenerationType="class">
+        <attribute name="cabinClass" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="price" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="remainingSeats" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="flight" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Flight" inverseName="cabins" inverseEntity="Flight"/>
+    </entity>
+    <entity name="Destination" representedClassName="Destination" syncable="YES" codeGenerationType="class">
+        <attribute name="city" optional="YES" attributeType="String"/>
+        <attribute name="country" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="airports" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Airport" inverseName="destination" inverseEntity="Airport"/>
+        <relationship name="hotels" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Hotel" inverseName="destination" inverseEntity="Hotel"/>
+    </entity>
+    <entity name="Flight" representedClassName="Flight" syncable="YES" codeGenerationType="class">
+        <attribute name="arrivalTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="departureTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="duration" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="flightNumber" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="airline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airline" inverseName="flights" inverseEntity="Airline"/>
+        <relationship name="arrivalAirport" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="arrivalFlights" inverseEntity="Airport"/>
+        <relationship name="cabins" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Cabin" inverseName="flight" inverseEntity="Cabin"/>
+        <relationship name="departureAirport" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="departingFlights" inverseEntity="Airport"/>
+    </entity>
+    <entity name="Hotel" representedClassName="Hotel" syncable="YES" codeGenerationType="class">
+        <attribute name="hotelAddress" optional="YES" attributeType="String"/>
+        <attribute name="hotelDescription" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="rating" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="destination" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Destination" inverseName="hotels" inverseEntity="Destination"/>
     </entity>
 </model>

@@ -17,11 +17,15 @@ final class HotelDetailsViewModel: ObservableObject {
     }
 
     var name: String {
-        hotel.name
+        hotel.name ?? "Unknown Hotel"
     }
 
     var city: String {
-        hotel.city
+        hotel.destination?.city ?? "Unknown City"
+    }
+    
+    var address: String {
+        hotel.hotelAddress ?? "Address not available"
     }
 
     var ratingText: String {
@@ -29,10 +33,20 @@ final class HotelDetailsViewModel: ObservableObject {
     }
 
     var priceText: String {
-        "$\(hotel.pricePerNight)/night"
+        if hotel.responds(to: Selector(("pricePerNight"))) {
+            return "Price unavailable"
+        } else {
+            return "Price unavailable"
+        }
     }
 
     var shortDescription: String {
-        "A comfortable stay in \(hotel.city), ideal for travelers looking for convenience and value."
+        let description = hotel.hotelDescription?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        
+        if !description.isEmpty {
+            return description
+        }
+        
+        return "A comfortable stay in \(city), ideal for travelers looking for convenience and value."
     }
 }

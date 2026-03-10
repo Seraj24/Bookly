@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct FlightsResultsView: View {
+    
+    @EnvironmentObject private var holder: BooklyHolder
+    
     @StateObject private var vm: FlightsResultsViewModel
 
     init(request: FlightSearchRequest) {
@@ -18,12 +21,12 @@ struct FlightsResultsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 headerSection
-
+                
                 if vm.isLoading {
                     ProgressView("Loading flights...")
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 40)
-
+                    
                 } else if vm.flights.isEmpty {
                     ContentUnavailableView(
                         "No flights found",
@@ -32,7 +35,7 @@ struct FlightsResultsView: View {
                     )
                     .frame(maxWidth: .infinity)
                     .padding(.top, 40)
-
+                    
                 } else {
                     LazyVStack(spacing: 12) {
                         ForEach(vm.flights) { flight in
@@ -51,6 +54,19 @@ struct FlightsResultsView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Flights")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            vm.setFlights(holder.flights)
+            print("TOTAL HOLDER FLIGHTS:", holder.flights.count)
+            for flight in holder.flights {
+                print(
+                    "FLIGHT:",
+                    flight.flightNumber ?? "nil",
+                    flight.departureAirport?.code ?? "nil",
+                    "->",
+                    flight.arrivalAirport?.code ?? "nil"
+                )
+            }
+        }
     }
 
     private var headerSection: some View {

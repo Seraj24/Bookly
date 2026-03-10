@@ -9,7 +9,11 @@ import SwiftUI
 
 struct SignInView: View {
     
+    @EnvironmentObject private var holder: BooklyHolder
+    @Environment(\.managedObjectContext) private var context
+    
     @StateObject private var vm: SignInViewModel = SignInViewModel()
+
     
     var body: some View {
         ScrollView {
@@ -35,6 +39,9 @@ struct SignInView: View {
         .background(Color("BackgroundColor").ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .navigationBar)
+        .onAppear {
+            vm.configure(holder: holder, context: context)
+        }
     }
     
     private var headerSection: some View {
@@ -119,11 +126,11 @@ struct SignInView: View {
     }
     
     private var guestLink: some View {
-        NavigationLink("Continue as guest") {
-            HomeView()
+        Button("Continue as guest") {
+            vm.continueAsGuest()
         }
-        .font(.footnote)
-        .foregroundStyle(.secondary)
+        .buttonStyle(.bordered)
+        .frame(height: 36)
         .padding(.top, 4)
     }
     

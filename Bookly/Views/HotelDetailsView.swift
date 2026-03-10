@@ -105,6 +105,14 @@ struct HotelDetailsView: View {
                 value: vm.city,
                 systemImage: "location"
             )
+            
+            Divider()
+            
+            detailsRow(
+                title: "Address",
+                value: vm.address,
+                systemImage: "mappin"
+            )
         }
         .padding()
         .background(Color(.systemBackground))
@@ -133,6 +141,7 @@ struct HotelDetailsView: View {
             Spacer()
 
             Text(value)
+                .multilineTextAlignment(.trailing)
         }
     }
 }

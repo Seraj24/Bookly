@@ -6,14 +6,15 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct AccountView: View {
     
-    @StateObject private var vm: AccountViewModel
+    @EnvironmentObject private var holder: BooklyHolder
+    @Environment(\.managedObjectContext) private var context
     
-    init() {
-        _vm = StateObject(wrappedValue: AccountViewModel())
-    }
+    @StateObject private var vm: AccountViewModel = AccountViewModel()
+    
     
     var body: some View {
         ScrollView {
@@ -31,6 +32,13 @@ struct AccountView: View {
         .background(Color("BackgroundColor").ignoresSafeArea())
         .navigationTitle("Account")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            vm.configure(holder: holder, context: context)
+            vm.refreshUser()
+            print("Current user email:", vm.appUser?.email ?? "nil")
+            print("Current user first name:", vm.appUser?.firstName ?? "nil")
+            print("Current user last name:", vm.appUser?.lastName ?? "nil")
+        }
     }
     
     private var header: some View {
@@ -49,10 +57,10 @@ struct AccountView: View {
         VStack(alignment: .leading, spacing: 16) {
             if let user = vm.appUser {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("\(user.firstName) \(user.lastName)")
+                    Text("\(user.firstName ?? "") \(user.lastName ?? "")")
                         .font(.headline)
                     
-                    Text(user.email)
+                    Text(user.email ?? "")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -122,9 +130,5 @@ struct AccountView: View {
             .buttonStyle(.borderedProminent)
         }
     }
-}
-
-#Preview {
-    AccountView()
 }
 

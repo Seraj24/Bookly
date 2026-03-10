@@ -32,8 +32,10 @@ struct BooklyApp: App {
     
     var body: some Scene {
         WindowGroup {
+            let ctx = persistenceController.container.viewContext
             ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environment(\.managedObjectContext, ctx)
+                .environmentObject(BooklyHolder(ctx))
         }
     }
 }

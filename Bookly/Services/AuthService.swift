@@ -9,173 +9,215 @@ import Foundation
 import Combine
 import FirebaseAuth
 import FirebaseFirestore
-
+import CoreData
 
 class AuthService: ObservableObject {
     
-    
     static let shared = AuthService()
-    
     
     @Published var currentUser: AppUser?
     
-    // db reference
-    private let db = Firestore.firestore()
+    @Published var isGuest: Bool = false
     
-    func signUp(firstName: String, lastName: String, email: String, passwrod: String, completion: @escaping (Result<AppUser, Error>) -> Void) {
+    func signUp(
+        firstName: String,
+        lastName: String,
+        email: String,
+        password: String,
+        holder: BooklyHolder,
+        context: NSManagedObjectContext,
+        completion: @escaping (Result<AppUser, Error>) -> Void
+    ) {
         
-        
-        Auth.auth().createUser(withEmail: email, password: passwrod) { result, error in
+        Auth.auth().createUser(withEmail: email, password: password) { result, error in
+            
             if let error = error {
-                print(error.localizedDescription)
-                return completion(.failure(error))
+                completion(.failure(error))
+                return
             }
             
             guard let user = result?.user else {
-                print(result)
-                return completion(.failure(SimpleError("No user found")))
+                completion(.failure(SimpleError("No user found")))
+                return
             }
             
             let uid = user.uid
+            let safeEmail = user.email ?? email
             
-            let appUser = AppUser(id: uid, email: email, firstName: firstName, lastName: lastName)
-            
-            do {
-                try self.db.collection("users").document(uid).setData(from: appUser) {
-                    error in
-                    if let error = error {
-                        print(error.localizedDescription)
-                        return completion(.failure(error))
-                    }
-                    
-                    DispatchQueue.main.async {
-                        self.currentUser = appUser
-                    } // update in the main
-                    
-                    completion(.success(appUser))
-                    
-                }
-            }catch {
-                completion(.failure(SimpleError("Unable to create Profile")))
-            }
-            
-            
-        }
-    }
-    
-    
-    func login(email: String, password: String, completion: @escaping (Result<AppUser, Error>)-> Void) {
-        Auth.auth().signIn(withEmail: email, password: password) { result, error in
-            if let error = error {
-                completion(.failure(error))
-            } else if let user = result?.user {
-                
-                // fetch the user
-                self.fetchCurrentAppUser { res in
-                    switch res {
-                        
-                    case .failure(let failure):
-                        completion(.failure(failure))
-                        
-                    case .success(let appUserObj):
-                        if let appUser = appUserObj {
-                            completion(.success(appUser))
-                        }else {
-                            
-                            let safeEmail = user.email ?? email
-
-                            let appUser = AppUser(
-                                                id: user.uid,
-                                                email: safeEmail,
-                                                firstName: "",
-                                                lastName: "",)
-                            
-                            // we will push a miniaml record object to the firestore
-                            do {
-                                try self.db.collection("users").document(user.uid).setData(from: appUser) {
-                                    error in
-                                    
-                                    if let error = error {
-                                        completion(.failure(error))
-                                    }
-                                    
-                                    DispatchQueue.main.async {
-                                        self.currentUser = appUser
-                                    }
-                                    completion(.success(appUser))
-                                }
-                            }catch {
-                                completion(.failure(error))
-                            }
-                            
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    
-    // fetch current user
-    
-    func fetchCurrentAppUser(completion: @escaping (Result<AppUser?, Error>)-> Void){
-        guard let uid = Auth.auth().currentUser?.uid else {
             DispatchQueue.main.async {
-                self.currentUser = nil
                 
+                let appUser = holder.createUser(
+                    id: uid,
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: safeEmail,
+                    isActive: true,
+                    context
+                )
+                
+                let data: [String: Any] = [
+                    "id": uid,
+                    "firstName": firstName,
+                    "lastName": lastName,
+                    "email": safeEmail,
+                    "isActive": true
+                ]
+                
+                Firestore.firestore()
+                    .collection("users")
+                    .document(uid)
+                    .setData(data) { error in
+                        
+                        if let error = error {
+                            completion(.failure(error))
+                            return
+                        }
+                        
+                        self.currentUser = appUser
+                        completion(.success(appUser))
+                    }
             }
+        }
+    }
+    
+        func login(
+            email: String,
+            password: String,
+            holder: BooklyHolder,
+            context: NSManagedObjectContext,
+            completion: @escaping (Result<AppUser, Error>) -> Void
+        ) {
             
-            return completion(.success(nil))
+            Auth.auth().signIn(withEmail: email, password: password) { result, error in
+                
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+                
+                guard let user = result?.user else {
+                    completion(.failure(SimpleError("No user found")))
+                    return
+                }
+                
+                let uid = user.uid
+                
+                DispatchQueue.main.async {
+                    
+                    if let existingUser = holder.fetchUser(byId: uid, context) {
+                        
+                        existingUser.isActive = true
+                        holder.saveContext(context)
+                        
+                        self.currentUser = existingUser
+                        completion(.success(existingUser))
+                        
+                    } else {
+                        
+                        let safeEmail = user.email ?? email
+                        
+                        let appUser = holder.createUser(
+                            id: uid,
+                            firstName: "",
+                            lastName: "",
+                            email: safeEmail,
+                            isActive: true,
+                            context
+                        )
+                        
+                        self.currentUser = appUser
+                        completion(.success(appUser))
+                    }
+                }
+            }
         }
         
-        db.collection("users").document(uid).getDocument { snap, error in
-            if let error = error { return completion(.failure(error)) }
-            guard let snap = snap else { return completion(.success(nil)) }
+        func fetchCurrentAppUser(
+            holder: BooklyHolder,
+            context: NSManagedObjectContext,
+            completion: @escaping (Result<AppUser?, Error>) -> Void
+        ) {
+            
+            guard let uid = Auth.auth().currentUser?.uid else {
+                DispatchQueue.main.async {
+                    self.currentUser = nil
+                }
+                return completion(.success(nil))
+            }
+            
+            DispatchQueue.main.async {
+                if let user = holder.fetchUser(byId: uid, context) {
+                    self.currentUser = user
+                    completion(.success(user))
+                } else {
+                    completion(.success(nil))
+                }
+            }
+        }
+        
+        
+        func updateProfile(
+            firstName: String,
+            lastName: String,
+            holder: BooklyHolder,
+            context: NSManagedObjectContext,
+            completion: @escaping (Result<Void, Error>) -> Void
+        ) {
+            
+            guard let currentUser else {
+                return completion(.failure(SimpleError("No current user")))
+            }
+            
+            DispatchQueue.main.async {
+                
+                do {
+                    
+                    holder.updateUser(
+                        user: currentUser,
+                        firstName: firstName,
+                        lastName: lastName,
+                        context
+                    )
+                    
+                    try context.save()
+                    
+                    completion(.success(()))
+                    
+                } catch {
+                    completion(.failure(error))
+                }
+            }
+        }
+        
+        
+        func signOut(
+            holder: BooklyHolder,
+            context: NSManagedObjectContext
+        ) -> Result<Void, Error> {
             
             do {
-                let user = try snap.data(as: AppUser.self)
                 
-                DispatchQueue.main.async { self.currentUser = user }
-                completion(.success(user))
+                try Auth.auth().signOut()
+                
+                DispatchQueue.main.async {
+                    
+                    self.currentUser?.isActive = false
+                    
+                    do {
+                        try context.save()
+                    } catch {
+                        print("CoreData save error \(error)")
+                    }
+                    
+                    self.currentUser = nil
+                }
+                
+                return .success(())
                 
             } catch {
-                completion(.failure(error))
+                
+                print("Sign out error: \(error.localizedDescription)")
+                return .failure(error)
             }
         }
     }
-    
-    
-    // updating the user name
-    
-    func updateProfile(displayName: String, completion: @escaping (Result<Void, Error>)-> Void) {
-        guard let uid = Auth.auth().currentUser?.uid else {
-            return completion(.success(()))
-        } // if not uid is found it will be empty string
-        
-        db.collection("users").document(uid).updateData(["displayName": displayName]) { error in
-            if let error = error {
-                return completion(.failure(error))
-            }else {
-                self.fetchCurrentAppUser { _ in
-                    completion(.success(()))
-                }
-            }
-        }
-        
-    }
-    
-    
-    // signout
-    func signOut() -> Result<Void, Error> {
-        do {
-            try Auth.auth().signOut()
-            DispatchQueue.main.async {
-                self.currentUser = nil
-            }
-            return .success(())
-        } catch {
-            print("Sign out error: \(error.localizedDescription)")
-            return .failure(error)
-        }
-    }
-}
