@@ -18,27 +18,58 @@ struct InputField: View {
     var disableAutoCorrection: Bool = false
     var autoCapitalization: TextInputAutocapitalization = .sentences
     var isSecure: Bool = false
-    
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Label(title, systemImage: systemImage)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
 
-            Group {
-                if isSecure {
-                    SecureField(placeholder ?? title, text: $text)
-                } else {
-                    TextField(placeholder ?? title, text: $text)
-                }
+    @FocusState private var isFocused: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+
+            HStack(spacing: 6) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(isFocused ? .primary: .secondary)
+
+                Text(title)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(isFocused ? .primary : .secondary)
             }
-            .textFieldStyle(.roundedBorder)
-            .textContentType(textContentType)
-            .keyboardType(keyboardType)
-            .disableAutocorrection(disableAutoCorrection)
-            .textInputAutocapitalization(autoCapitalization)
-            .accessibilityLabel(Text(title))
+            .animation(.easeInOut(duration: 0.2), value: isFocused)
+
+            ZStack {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color(.systemBackground))
+                    .shadow(
+                        color: isFocused
+                        ? Color.accentColor.opacity(0.25)
+                        : Color.black.opacity(0.05),
+                        radius: isFocused ? 6 : 3
+                    )
+
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(
+                        isFocused
+                        ? Color.accentColor
+                        : Color.gray.opacity(0.2),
+                        lineWidth: 1.2
+                    )
+
+                Group {
+                    if isSecure {
+                        SecureField(placeholder ?? title, text: $text)
+                    } else {
+                        TextField(placeholder ?? title, text: $text)
+                    }
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .focused($isFocused)
+                .textContentType(textContentType)
+                .keyboardType(keyboardType)
+                .disableAutocorrection(disableAutoCorrection)
+                .textInputAutocapitalization(autoCapitalization)
+                .accessibilityLabel(Text(title))
+            }
+            .frame(height: 52)
         }
     }
 }

@@ -10,24 +10,26 @@ import SwiftUI
 struct FormHeader: View {
     let title: String
     let subtitle: String
+    var alignLeading: Bool = false
     
-    let alignLeading: Bool = false
-
     var body: some View {
-        VStack(alignment: alignLeading ? .leading : .center, spacing: 6) {
+        VStack(alignment: alignLeading ? .leading : .center, spacing: 12) {
             
             Text(title)
-                .font(.largeTitle)
-                .fontWeight(.bold)
-
+                .font(.system(size: 34, weight: .bold, design: .rounded))
+                .tracking(-0.5)
+            
             Text(subtitle)
-                .font(.subheadline)
+                .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(alignLeading ? .leading : .center)
-
+                .lineSpacing(3)
+                .padding(.horizontal, alignLeading ? 0 : 16)
         }
         .frame(maxWidth: .infinity, alignment: alignLeading ? .leading : .center)
-        .padding()
-        .padding(.top, 10)
-        .background(Color(red: 0.20, green: 0.55, blue: 0.85))    }
+        .padding(.horizontal, 24)
+        .padding(.top, 32)
+        .padding(.bottom, 12)
+        .background(.yellow)
+    }
 }

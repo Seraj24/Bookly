@@ -12,92 +12,134 @@ struct SignInView: View {
     @StateObject private var vm: SignInViewModel = SignInViewModel()
     
     var body: some View {
-        
-        VStack(spacing: 0) {
-            FormHeader(title: "Sign In", subtitle: "Access the best deals for your next trip.")
+        ScrollView {
+            VStack(spacing: 24) {
                 
-
-            ScrollView {
-                VStack(spacing: 14) {
-                    VStack(spacing: 12) {
-                        InputField(
-                            title: "Email",
-                            systemImage: "at",
-                            text: $vm.email,
-                            placeholder: "Email",
-                            textContentType: .emailAddress,
-                            keyboardType: .emailAddress,
-                            disableAutoCorrection: true,
-                            autoCapitalization: .never
-                        )
-                        
-                        InputField(
-                            title: "Password",
-                            systemImage: "lock",
-                            text: $vm.password,
-                            placeholder: "At least 6 characters",
-                            textContentType: .newPassword,
-                            disableAutoCorrection: true,
-                            autoCapitalization: .never,
-                            isSecure: true
-                        )
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .shadow(radius: 2, y: 1)
-
-                    HStack {
-                        Spacer()
-                        Button("Forgot password?") {
-                            // TODO
-                        }
-                        .font(.footnote)
-                        .foregroundColor(.blue)
-                    }
-
-                    Button {
-                        vm.signInTapped()
-                    } label: {
-                        Label("Sign In", systemImage: "airplane.arrival")
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                    }
-                    .fontWeight(.semibold)
-                    .buttonStyle(.borderedProminent)
-                    .disabled(!vm.canSubmit)
-                    .opacity(vm.canSubmit ? 1 : 0.6)
-                    
-                    Text(vm.errorMessage ?? "")
-                        .foregroundColor(.red)
-
-
-                    NavigationLink("Continue as guest") {
-                        HomeView()
-                    }
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 4)
-
-
-                    HStack(spacing: 6) {
-                        Text("New here?")
-                            .foregroundStyle(.secondary)
-
-                        NavigationLink("Create an account") {
-                            SignUpView()
-                        }
-                        .fontWeight(.semibold)
-                    }
-                    .font(.footnote)
-                    .padding(.top, 8)
-                }
-                .padding()
+                headerSection
+                
+                form
+                
+                forgotPasswordRow
+                
+                signInButton
+                
+                errorText
+                
+                guestLink
+                
+                signUpRow
             }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .top)
         }
-        .navigationTitle("Bookly")
+        .background(Color("BackgroundColor").ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
-        .background(.white)
+        .toolbar(.hidden, for: .navigationBar)
+    }
+    
+    private var headerSection: some View {
+        VStack(spacing: 8) {
+            Text("Bookly")
+                .font(.system(size: 30, weight: .bold))
+                .foregroundStyle(Color("BrandNavy"))
+            
+            Text("Sign In")
+                .font(.system(size: 34, weight: .bold))
+                .foregroundStyle(.primary)
+            
+            Text("Access the best deals for your next trip.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.top, 16)
+    }
+    
+    private var form: some View {
+        VStack(spacing: 18) {
+            InputField(
+                title: "Email",
+                systemImage: "at",
+                text: $vm.email,
+                placeholder: "Email",
+                textContentType: .emailAddress,
+                keyboardType: .emailAddress,
+                disableAutoCorrection: true,
+                autoCapitalization: .never
+            )
+            
+            InputField(
+                title: "Password",
+                systemImage: "lock",
+                text: $vm.password,
+                placeholder: "At least 6 characters",
+                textContentType: .password,
+                disableAutoCorrection: true,
+                autoCapitalization: .never,
+                isSecure: true
+            )
+        }
+        .padding(.vertical, 10)
+    }
+    
+    private var forgotPasswordRow: some View {
+        HStack {
+            Spacer()
+            Button("Forgot password?") {
+                // TODO
+            }
+            .font(.footnote)
+            .foregroundStyle(Color("PrimaryColor"))
+        }
+    }
+    
+    private var signInButton: some View {
+        Button {
+            vm.signInTapped()
+        } label: {
+            Label("Sign In", systemImage: "airplane.arrival")
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+        }
+        .fontWeight(.semibold)
+        .buttonStyle(.borderedProminent)
+        .tint(Color("BrandNavy"))
+        .disabled(!vm.canSubmit)
+        .opacity(vm.canSubmit ? 1 : 0.6)
+    }
+    
+    @ViewBuilder
+    private var errorText: some View {
+        if let errorMessage = vm.errorMessage, !errorMessage.isEmpty {
+            Text(errorMessage)
+                .font(.footnote)
+                .foregroundStyle(.red)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+    
+    private var guestLink: some View {
+        NavigationLink("Continue as guest") {
+            HomeView()
+        }
+        .font(.footnote)
+        .foregroundStyle(.secondary)
+        .padding(.top, 4)
+    }
+    
+    private var signUpRow: some View {
+        HStack(spacing: 6) {
+            Text("New here?")
+                .foregroundStyle(.secondary)
+            
+            NavigationLink("Create an account") {
+                SignUpView()
+            }
+            .fontWeight(.semibold)
+            .foregroundStyle(Color("PrimaryColor"))
+        }
+        .font(.footnote)
+        .padding(.top, 4)
     }
 }
     

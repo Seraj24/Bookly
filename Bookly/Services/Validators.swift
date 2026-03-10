@@ -7,6 +7,13 @@
 
 import Foundation
 
+enum SignUpField {
+    case firstName
+    case lastName
+    case email
+    case password
+}
+
 struct FormValidator {
     
     func validateRequired(_ value: String, fieldName: String) -> String? {
@@ -44,13 +51,32 @@ struct FormValidator {
         validatePassword(password) == nil
     }
 
-
-    func validateSignUp(firstName: String, lastName: String, email: String, password: String) -> Bool {
-        validateFirstName(firstName) == nil &&
-        validateLastName(lastName) == nil &&
-        validateEmail(email) == nil &&
-        validatePassword(password) == nil
+    func validateSignUp(
+        firstName: String,
+        lastName: String,
+        email: String,
+        password: String
+    ) -> [SignUpField: String] {
         
+        var errors: [SignUpField: String] = [:]
+
+        if let error = validateFirstName(firstName) {
+            errors[.firstName] = error
+        }
+
+        if let error = validateLastName(lastName) {
+            errors[.lastName] = error
+        }
+
+        if let error = validateEmail(email) {
+            errors[.email] = error
+        }
+
+        if let error = validatePassword(password) {
+            errors[.password] = error
+        }
+
+        return errors
     }
     
 }
