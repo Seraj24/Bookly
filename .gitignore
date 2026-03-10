@@ -1,1 +1,18 @@
-# Xcode DerivedData/ *.xcuserdata *.xcuserstate *.xcworkspace/xcuserdata # Swift Package Manager .build/ # macOS .DS_Store
+# macOS
+.DS_Store
+
+# Xcode user files
+xcuserdata/
+*.xcuserdata
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+
+# Xcode build folders
+DerivedData/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Firebase
+GoogleService-Info.plist
