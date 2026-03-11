@@ -9,6 +9,8 @@ import SwiftUI
 
 struct SearchView: View {
     
+    @StateObject private var vm = SearchViewModel()
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -16,8 +18,8 @@ struct SearchView: View {
                 headerSection
                 
                 HStack(spacing: 16) {
-                    NavigationLink {
-                        HotelSearchView { _ in }
+                    Button {
+                        vm.openHotelSearch()
                     } label: {
                         searchCategoryCard(
                             title: "Hotels",
@@ -27,8 +29,8 @@ struct SearchView: View {
                     }
                     .buttonStyle(.plain)
                     
-                    NavigationLink {
-                        FlightSearchView { _ in }
+                    Button {
+                        vm.openFlightSearch()
                     } label: {
                         searchCategoryCard(
                             title: "Flights",
@@ -44,6 +46,25 @@ struct SearchView: View {
         .background(Color("BackgroundColor"))
         .navigationTitle("Search")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(item: $vm.route) { route in
+            switch route {
+            case .hotelSearch:
+                HotelSearchView { destination in
+                    vm.showHotelResults(destination: destination)
+                }
+                
+            case .flightSearch:
+                FlightSearchView { request in
+                    vm.showFlightResults(request: request)
+                }
+                
+            case .hotelResults(let destination):
+                HotelsResultsView(destination: destination)
+                
+            case .flightResults(let request):
+                FlightsResultsView(request: request)
+            }
+        }
     }
     
     private var headerSection: some View {
@@ -95,8 +116,6 @@ struct SearchView: View {
         .shadow(color: .black.opacity(0.08), radius: 12, y: 6)
     }
 }
-
-
 #Preview {
     SearchView()
 }
