@@ -111,8 +111,8 @@ struct AccountView: View {
     @ViewBuilder
     private var actionButton: some View {
         if vm.appUser == nil {
-            NavigationLink {
-                SignInView()
+            Button {
+                vm.signIn()
             } label: {
                 Label("Sign In", systemImage: "person.crop.circle.badge.plus")
                     .frame(maxWidth: .infinity)

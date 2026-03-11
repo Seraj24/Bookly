@@ -28,6 +28,10 @@ final class AccountViewModel: ObservableObject {
         
     }
     
+    func signIn() {
+        auth.isGuest = false
+    }
+    
     func logOut() {
         
         guard let holder, let context else { return }

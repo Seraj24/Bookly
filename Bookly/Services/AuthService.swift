@@ -80,57 +80,85 @@ class AuthService: ObservableObject {
         }
     }
     
-        func login(
-            email: String,
-            password: String,
-            holder: BooklyHolder,
-            context: NSManagedObjectContext,
-            completion: @escaping (Result<AppUser, Error>) -> Void
-        ) {
-            
-            Auth.auth().signIn(withEmail: email, password: password) { result, error in
-                
-                if let error = error {
-                    completion(.failure(error))
-                    return
-                }
-                
-                guard let user = result?.user else {
-                    completion(.failure(SimpleError("No user found")))
-                    return
-                }
-                
-                let uid = user.uid
-                
+    func login(
+        email: String,
+        password: String,
+        holder: BooklyHolder,
+        context: NSManagedObjectContext,
+        completion: @escaping (Result<AppUser, Error>) -> Void
+    ) {
+        Auth.auth().signIn(withEmail: email, password: password) { result, error in
+            if let error = error {
                 DispatchQueue.main.async {
-                    
-                    if let existingUser = holder.fetchUser(byId: uid, context) {
-                        
-                        existingUser.isActive = true
-                        holder.saveContext(context)
-                        
-                        self.currentUser = existingUser
-                        completion(.success(existingUser))
-                        
-                    } else {
-                        
-                        let safeEmail = user.email ?? email
-                        
-                        let appUser = holder.createUser(
-                            id: uid,
-                            firstName: "",
-                            lastName: "",
-                            email: safeEmail,
-                            isActive: true,
-                            context
-                        )
-                        
+                    completion(.failure(error))
+                }
+                return
+            }
+
+            guard let firebaseUser = result?.user else {
+                DispatchQueue.main.async {
+                    completion(.failure(SimpleError("No user found after sign in.")))
+                }
+                return
+            }
+
+            let uid = firebaseUser.uid
+            let fallbackEmail = firebaseUser.email ?? email
+
+            Firestore.firestore()
+                .collection("users")
+                .document(uid)
+                .getDocument { snapshot, error in
+
+                    if let error = error {
+                        DispatchQueue.main.async {
+                            completion(.failure(error))
+                        }
+                        return
+                    }
+
+                    let data = snapshot?.data()
+
+                    let firstName = (data?["firstName"] as? String)?
+                        .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+                    let lastName = (data?["lastName"] as? String)?
+                        .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+                    let safeEmail = ((data?["email"] as? String) ?? fallbackEmail)
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                        .lowercased()
+
+                    DispatchQueue.main.async {
+                        let appUser: AppUser
+
+                        if let existingUser = holder.fetchUser(byId: uid, context) {
+                            existingUser.firstName = firstName
+                            existingUser.lastName = lastName
+                            existingUser.email = safeEmail
+                            existingUser.isActive = true
+
+                            holder.saveContext(context)
+                            appUser = existingUser
+                        } else {
+                            appUser = holder.createUser(
+                                id: uid,
+                                firstName: firstName,
+                                lastName: lastName,
+                                email: safeEmail,
+                                isActive: true,
+                                context
+                            )
+                        }
+
+                        self.isGuest = false
                         self.currentUser = appUser
+
                         completion(.success(appUser))
                     }
                 }
-            }
         }
+    }
         
         func fetchCurrentAppUser(
             holder: BooklyHolder,
