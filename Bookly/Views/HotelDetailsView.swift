@@ -24,6 +24,8 @@ struct HotelDetailsView: View {
                 summaryCard
 
                 detailsCard
+                
+                roomType
 
                 bookingCard
             }
@@ -118,30 +120,116 @@ struct HotelDetailsView: View {
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
+    
+    private var roomType: some View {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Select Room")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .padding(.horizontal)
+                
+                ForEach(vm.rooms, id: \.objectID) { room in
+                    roomCard(room)
+                }
 
-    private var bookingCard: some View {
-        Button {
-            print("Reserve tapped")
-        } label: {
-            Text("Reserve Now")
-                .frame(maxWidth: .infinity)
+                if let selectedRoom = vm.selectedRoom {
+                    quantityCard(for: selectedRoom)
+                }
+            }
         }
-        .buttonStyle(.borderedProminent)
-        .fontWeight(.semibold)
-        .padding()
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+
+        private func roomCard(_ room: Room) -> some View {
+            
+            SelectionOptionCard(
+                    title: (room.roomType ?? "Unknown Room").capitalized,
+                    subtitle: "Available rooms: \(room.quantity)",
+                    priceText: "$199",
+                    priceCaption: "1 night",
+                    benefits: [
+                        OptionBenefit(
+                            text: "Free cancellation",
+                            systemImage: "checkmark.circle.fill",
+                            color: .green
+                        ),
+                        OptionBenefit(
+                            text: "No prepayment needed",
+                            systemImage: "checkmark.circle.fill",
+                            color: .green
+                        ),
+                        OptionBenefit(
+                            text: "Sleeps 2 guests",
+                            systemImage: "person.2.fill",
+                            color: .secondary
+                        )
+                    ],
+                    isSelected: vm.isSelected(room),
+                    actionTitle: vm.isSelected(room) ? "Selected" : "Select",
+                    onSelect: {
+                        vm.selectRoom(room)
+                    }
+                )
+        }
+
+    private func quantityCard(for room: Room) -> some View {
+        QuantitySelectorCard(
+            title: "Room Quantity",
+            subtitle: "Selected room: \((room.roomType ?? "Unknown Room").capitalized)",
+            value: vm.selectedQuantity,
+            availabilityText: "Available: \(room.quantity)",
+            canDecrease: vm.selectedQuantity > 1,
+            canIncrease: vm.selectedQuantity < vm.maxSelectableQuantity,
+            onDecrease: {
+                vm.decreaseQuantity()
+            },
+            onIncrease: {
+                vm.increaseQuantity()
+            }
+        )
     }
+
+        private var bookingCard: some View {
+            VStack(spacing: 12) {
+                if let selectedRoom = vm.selectedRoom {
+                    HStack {
+                        Text("Selected")
+                            .foregroundStyle(.secondary)
+
+                        Spacer()
+
+                        Text("\((selectedRoom.roomType ?? "Unknown Room").capitalized) × \(vm.selectedQuantity)")
+                            .fontWeight(.semibold)
+                    }
+                    .font(.subheadline)
+                }
+
+                Button {
+                    print("Reserve tapped")
+                    print("Room: \(vm.selectedRoom?.roomType ?? "None")")
+                    print("Quantity: \(vm.selectedQuantity)")
+                } label: {
+                    Text("Reserve Now")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .fontWeight(.semibold)
+                .disabled(!vm.canReserve)
+            }
+            .padding()
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
 
     private func detailsRow(title: String, value: String, systemImage: String) -> some View {
         HStack {
             Label(title, systemImage: systemImage)
                 .foregroundStyle(.secondary)
-
+            
             Spacer()
-
+            
             Text(value)
                 .multilineTextAlignment(.trailing)
         }
+        
     }
+    
 }

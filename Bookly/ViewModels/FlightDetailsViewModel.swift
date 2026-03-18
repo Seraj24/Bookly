@@ -7,13 +7,39 @@
 
 import Foundation
 import Combine
+import CoreData
 
 final class FlightDetailsViewModel: ObservableObject {
     
-    let flight: Flight
+    private let flight: Flight
+    private var holder: BooklyHolder?
+    private var context: NSManagedObjectContext?
+    
+    @Published var cabins: [Cabin] = []
+    @Published var selectedCabin: Cabin?
+    @Published var selectedSeatCount: Int = 1
     
     init(flight: Flight) {
         self.flight = flight
+    }
+    
+    func configure(holder: BooklyHolder, context: NSManagedObjectContext) {
+        self.holder = holder
+        self.context = context
+        loadCabins()
+    }
+    
+    func loadCabins() {
+        guard let holder, let context else { return }
+        cabins = holder.fetchCabins(for: flight, context)
+        
+        if selectedCabin == nil {
+            selectedCabin = cabins.first
+        }
+        
+        if let selectedCabin, selectedSeatCount > Int(selectedCabin.remainingSeats) {
+            selectedSeatCount = Int(selectedCabin.remainingSeats)
+        }
     }
     
     var airlineText: String {
@@ -21,12 +47,18 @@ final class FlightDetailsViewModel: ObservableObject {
     }
     
     var cabinText: String {
-        cheapestCabin?.cabinClass ?? "Cabin not available"
+        selectedCabin?.cabinClass ?? "Cabin not available"
     }
     
     var priceText: String {
-        guard let cabin = cheapestCabin else { return "N/A" }
+        guard let cabin = selectedCabin else { return "N/A" }
         return String(format: "$%.0f", cabin.price)
+    }
+    
+    var totalPriceText: String {
+        guard let cabin = selectedCabin else { return "N/A" }
+        let total = cabin.price * Double(selectedSeatCount)
+        return String(format: "$%.0f", total)
     }
     
     var departureTimeText: String {
@@ -53,7 +85,7 @@ final class FlightDetailsViewModel: ObservableObject {
     }
     
     var stopsText: String {
-        "Flight"
+        "Direct"
     }
     
     var dateText: String {
@@ -65,9 +97,38 @@ final class FlightDetailsViewModel: ObservableObject {
         "A clean and comfortable option for your trip."
     }
     
-    private var cheapestCabin: Cabin? {
-        let cabinsSet = flight.cabins as? Set<Cabin> ?? []
-        return cabinsSet.sorted { $0.price < $1.price }.first
+    var canBook: Bool {
+        selectedCabin != nil
+    }
+    
+    var maxSelectableSeats: Int {
+        Int(selectedCabin?.remainingSeats ?? 1)
+    }
+    
+    func selectCabin(_ cabin: Cabin) {
+        selectedCabin = cabin
+        
+        if selectedSeatCount > Int(cabin.remainingSeats) {
+            selectedSeatCount = Int(cabin.remainingSeats)
+        }
+        
+        if selectedSeatCount < 1 {
+            selectedSeatCount = 1
+        }
+    }
+    
+    func isSelected(_ cabin: Cabin) -> Bool {
+        selectedCabin?.objectID == cabin.objectID
+    }
+    
+    func increaseSeatCount() {
+        guard selectedSeatCount < maxSelectableSeats else { return }
+        selectedSeatCount += 1
+    }
+    
+    func decreaseSeatCount() {
+        guard selectedSeatCount > 1 else { return }
+        selectedSeatCount -= 1
     }
     
     private func formatTime(_ date: Date?) -> String {

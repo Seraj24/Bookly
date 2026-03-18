@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct FlightDetailsView: View {
+    
+    @EnvironmentObject private var holder: BooklyHolder
+    @Environment(\.managedObjectContext) private var context
+    
     @StateObject private var vm: FlightDetailsViewModel
     
     init(flight: Flight) {
@@ -20,6 +24,7 @@ struct FlightDetailsView: View {
                 headerCard
                 routeCard
                 detailsCard
+                cabinSection
                 bookingCard
             }
             .padding()
@@ -27,6 +32,9 @@ struct FlightDetailsView: View {
         .navigationTitle("Flight Details")
         .navigationBarTitleDisplayMode(.inline)
         .background(Color(.systemGroupedBackground))
+        .onAppear {
+            vm.configure(holder: holder, context: context)
+        }
     }
     
     private var headerCard: some View {
@@ -159,15 +167,95 @@ struct FlightDetailsView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
     
+    private var cabinSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Select Cabin")
+                .font(.title2)
+                .fontWeight(.bold)
+                .padding(.horizontal)
+            
+            ForEach(vm.cabins, id: \.objectID) { cabin in
+                cabinCard(cabin)
+            }
+            
+            if let selectedCabin = vm.selectedCabin {
+                quantityCard(for: selectedCabin)
+            }
+        }
+    }
+    
+    private func cabinCard(_ cabin: Cabin) -> some View {
+        
+        SelectionOptionCard(
+            title: cabin.cabinClass ?? "Unknown Cabin",
+            subtitle: "Available seats: \(cabin.remainingSeats)",
+            priceText: String(format: "$%.0f", cabin.price),
+            priceCaption: "per seat",
+            benefits: [
+                OptionBenefit(
+                    text: "Carry-on included",
+                    systemImage: "checkmark.circle.fill",
+                    color: .green
+                ),
+                OptionBenefit(
+                    text: "Flexible booking",
+                    systemImage: "checkmark.circle.fill",
+                    color: .green
+                ),
+                OptionBenefit(
+                    text: "Comfortable seating",
+                    systemImage: "seat.side.right.fill",
+                    color: .secondary
+                )
+            ],
+            isSelected: vm.isSelected(cabin),
+            actionTitle: vm.isSelected(cabin) ? "Selected" : "Select",
+            onSelect: {
+                vm.selectCabin(cabin)
+            }
+        )
+    }
+    
+    private func quantityCard(for cabin: Cabin) -> some View {
+        QuantitySelectorCard(
+            title: "Passenger Quantity",
+            subtitle: "Selected cabin: \(cabin.cabinClass ?? "Unknown Cabin")",
+            value: vm.selectedSeatCount,
+            availabilityText: "Available: \(cabin.remainingSeats)",
+            canDecrease: vm.selectedSeatCount > 1,
+            canIncrease: vm.selectedSeatCount < vm.maxSelectableSeats,
+            onDecrease: {
+                vm.decreaseSeatCount()
+            },
+            onIncrease: {
+                vm.increaseSeatCount()
+            }
+        )
+    }
+    
     private var bookingCard: some View {
         VStack(spacing: 14) {
+            if let selectedCabin = vm.selectedCabin {
+                HStack {
+                    Text("Selected")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    
+                    Spacer()
+                    
+                    Text("\(selectedCabin.cabinClass ?? "Unknown Cabin") × \(vm.selectedSeatCount)")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
+            }
+            
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Total Price")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     
-                    Text(vm.priceText)
+                    Text(vm.totalPriceText)
                         .font(.title2)
                         .fontWeight(.bold)
                 }
@@ -177,12 +265,15 @@ struct FlightDetailsView: View {
             
             Button {
                 print("Book flight tapped")
+                print("Cabin: \(vm.selectedCabin?.cabinClass ?? "None")")
+                print("Seats: \(vm.selectedSeatCount)")
             } label: {
                 Text("Book Flight")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
             .fontWeight(.semibold)
+            .disabled(!vm.canBook)
         }
         .padding()
         .background(Color(.systemBackground))

@@ -140,6 +140,10 @@ enum BooklySeeder {
         hotel1.rating = 4.7
         hotel1.destination = barcelona
         
+        createRoom(type: .single, quantity: 5, hotel: hotel1, context: context)
+        createRoom(type: .double, quantity: 10, hotel: hotel1, context: context)
+        createRoom(type: .suite, quantity: 3, hotel: hotel1, context: context)
+        
         let hotel2 = Hotel(context: context)
         hotel2.id = UUID()
         hotel2.name = "Le Mount Stephen"
@@ -147,6 +151,10 @@ enum BooklySeeder {
         hotel2.hotelDescription = "Elegant downtown stay close to shopping and dining."
         hotel2.rating = 4.6
         hotel2.destination = montreal
+        
+        createRoom(type: .single, quantity: 6, hotel: hotel2, context: context)
+        createRoom(type: .double, quantity: 8, hotel: hotel2, context: context)
+        createRoom(type: .suite, quantity: 2, hotel: hotel2, context: context)
         
         let hotel3 = Hotel(context: context)
         hotel3.id = UUID()
@@ -156,6 +164,10 @@ enum BooklySeeder {
         hotel3.rating = 4.5
         hotel3.destination = toronto
         
+        createRoom(type: .single, quantity: 8, hotel: hotel3, context: context)
+        createRoom(type: .double, quantity: 12, hotel: hotel3, context: context)
+        createRoom(type: .suite, quantity: 4, hotel: hotel3, context: context)
+        
         let hotel4 = Hotel(context: context)
         hotel4.id = UUID()
         hotel4.name = "Pan Pacific Vancouver"
@@ -163,6 +175,10 @@ enum BooklySeeder {
         hotel4.hotelDescription = "Waterfront hotel with stunning harbor views."
         hotel4.rating = 4.4
         hotel4.destination = vancouver
+        
+        createRoom(type: .single, quantity: 4, hotel: hotel4, context: context)
+        createRoom(type: .double, quantity: 9, hotel: hotel4, context: context)
+        createRoom(type: .suite, quantity: 2, hotel: hotel4, context: context)
         
         let hotel5 = Hotel(context: context)
         hotel5.id = UUID()
@@ -172,6 +188,10 @@ enum BooklySeeder {
         hotel5.rating = 4.3
         hotel5.destination = paris
         
+        createRoom(type: .single, quantity: 5, hotel: hotel5, context: context)
+        createRoom(type: .double, quantity: 11, hotel: hotel5, context: context)
+        createRoom(type: .suite, quantity: 3, hotel: hotel5, context: context)
+        
         let hotel6 = Hotel(context: context)
         hotel6.id = UUID()
         hotel6.name = "The Tower Hotel"
@@ -179,6 +199,10 @@ enum BooklySeeder {
         hotel6.hotelDescription = "Comfortable stay near Tower Bridge."
         hotel6.rating = 4.2
         hotel6.destination = london
+        
+        createRoom(type: .single, quantity: 7, hotel: hotel6, context: context)
+        createRoom(type: .double, quantity: 10, hotel: hotel6, context: context)
+        createRoom(type: .suite, quantity: 2, hotel: hotel6, context: context)
         
         let hotel7 = Hotel(context: context)
         hotel7.id = UUID()
@@ -188,6 +212,10 @@ enum BooklySeeder {
         hotel7.rating = 4.8
         hotel7.destination = dubai
         
+        createRoom(type: .single, quantity: 6, hotel: hotel7, context: context)
+        createRoom(type: .double, quantity: 14, hotel: hotel7, context: context)
+        createRoom(type: .suite, quantity: 6, hotel: hotel7, context: context)
+        
         let hotel8 = Hotel(context: context)
         hotel8.id = UUID()
         hotel8.name = "The New Yorker Hotel"
@@ -195,6 +223,10 @@ enum BooklySeeder {
         hotel8.hotelDescription = "Classic Manhattan stay with easy city access."
         hotel8.rating = 4.1
         hotel8.destination = newYork
+        
+        createRoom(type: .single, quantity: 8, hotel: hotel8, context: context)
+        createRoom(type: .double, quantity: 12, hotel: hotel8, context: context)
+        createRoom(type: .suite, quantity: 3, hotel: hotel8, context: context)
         
         // MARK: - Flights
         let now = Date()
@@ -383,6 +415,18 @@ enum BooklySeeder {
         } catch {
             print("Seed failed: \(error)")
             
+        }
+        
+        func createRoom(
+            type: RoomType,
+            quantity: Int32,
+            hotel: Hotel,
+            context: NSManagedObjectContext
+        ) {
+            let room = Room(context: context)
+            room.roomType = type.rawValue
+            room.quantity = quantity
+            room.hotel = hotel
         }
     }
 }

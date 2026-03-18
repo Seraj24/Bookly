@@ -24,6 +24,7 @@ final class BooklyHolder: ObservableObject {
     @Published var destinations: [Destination] = []
     @Published var flights: [Flight] = []
     @Published var hotels: [Hotel] = []
+    @Published var rooms: [Room] = []
     
     init(_ context: NSManagedObjectContext) {
         BooklySeeder.seedIfNeeded(context)
@@ -39,6 +40,7 @@ final class BooklyHolder: ObservableObject {
         refreshDestinations(context)
         refreshFlights(context)
         refreshHotels(context)
+        refreshRooms(context)
     }
     
     func refreshAirlines(_ context: NSManagedObjectContext) {
@@ -67,6 +69,10 @@ final class BooklyHolder: ObservableObject {
     
     func refreshHotels(_ context: NSManagedObjectContext) {
         hotels = fetchHotels(context)
+    }
+    
+    func refreshRooms(_ context: NSManagedObjectContext) {
+        rooms = fetchRooms(context)
     }
     
     // MARK: - Fetchers
@@ -125,6 +131,10 @@ final class BooklyHolder: ObservableObject {
         catch { fatalError("Unresolved error \(error)") }
     }
     
+    func fetchRooms(_ context: NSManagedObjectContext) -> [Room] {
+        do { return try context.fetch(roomsFetch()) }
+        catch { fatalError("Unresolved error \(error)") }
+    }
     // MARK: - Fetch Requests
     func airlinesFetch() -> NSFetchRequest<Airline> {
         let request = Airline.fetchRequest()
@@ -191,6 +201,14 @@ final class BooklyHolder: ObservableObject {
         return request
     }
     
+    func roomsFetch() -> NSFetchRequest<Room> {
+        let request = Room.fetchRequest()
+        request.sortDescriptors = [
+            NSSortDescriptor(keyPath: \Room.roomType, ascending: true)
+        ]
+        return request
+    }
+
     func flightsByAirlineFetch(for airline: Airline) -> NSFetchRequest<Flight> {
         let request: NSFetchRequest<Flight> = Flight.fetchRequest()
         
@@ -238,6 +256,15 @@ final class BooklyHolder: ObservableObject {
             NSSortDescriptor(keyPath: \Cabin.price, ascending: true)
         ]
         
+        return request
+    }
+    
+    func roomsByHotelFetch(for hotel: Hotel) -> NSFetchRequest<Room> {
+        let request: NSFetchRequest<Room> = Room.fetchRequest()
+        request.predicate = NSPredicate(format: "hotel == %@", hotel)
+        request.sortDescriptors = [
+            NSSortDescriptor(keyPath: \Room.roomType, ascending: true)
+        ]
         return request
     }
     
@@ -564,6 +591,24 @@ final class BooklyHolder: ObservableObject {
         saveContext(context)
     }
     
+    func updateRoom(
+        room: Room,
+        roomType: String,
+        quantity: Int32,
+        hotel: Hotel?,
+        _ context: NSManagedObjectContext
+    ) {
+        room.roomType = roomType.trimmingCharacters(in: .whitespacesAndNewlines)
+        room.quantity = quantity
+        room.hotel = hotel
+
+        saveContext(context)
+    }
+
+    func deleteRoom(_ room: Room, _ context: NSManagedObjectContext) {
+        context.delete(room)
+        saveContext(context)
+    }
     
     // MARK: - Save
     func saveContext(_ context: NSManagedObjectContext) {
