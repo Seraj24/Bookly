@@ -143,7 +143,7 @@ struct HotelDetailsView: View {
             SelectionOptionCard(
                     title: (room.roomType ?? "Unknown Room").capitalized,
                     subtitle: "Available rooms: \(room.quantity)",
-                    priceText: "$199",
+                    priceText: String(format: "$%.0f", room.price),
                     priceCaption: "1 night",
                     benefits: [
                         OptionBenefit(
@@ -187,38 +187,52 @@ struct HotelDetailsView: View {
         )
     }
 
-        private var bookingCard: some View {
-            VStack(spacing: 12) {
-                if let selectedRoom = vm.selectedRoom {
-                    HStack {
-                        Text("Selected")
-                            .foregroundStyle(.secondary)
+    private var bookingCard: some View {
+        VStack(spacing: 12) {
+            if let selectedRoom = vm.selectedRoom {
+                HStack {
+                    Text("Selected")
+                        .foregroundStyle(.secondary)
 
-                        Spacer()
+                    Spacer()
 
-                        Text("\((selectedRoom.roomType ?? "Unknown Room").capitalized) × \(vm.selectedQuantity)")
-                            .fontWeight(.semibold)
-                    }
-                    .font(.subheadline)
+                    Text("\((selectedRoom.roomType ?? "Unknown Room").capitalized) × \(vm.selectedQuantity)")
+                        .fontWeight(.semibold)
                 }
+                .font(.subheadline)
 
-                Button {
-                    print("Reserve tapped")
-                    print("Room: \(vm.selectedRoom?.roomType ?? "None")")
-                    print("Quantity: \(vm.selectedQuantity)")
+                NavigationLink {
+                    HotelBookingView(
+                        vm: HotelBookingViewModel(
+                            selection: HotelBookingSelection(
+                                hotel: vm.hotel,
+                                room: selectedRoom,
+                                quantity: vm.selectedQuantity
+                            )
+                        )
+                    )
                 } label: {
                     Text("Reserve Now")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
                 .fontWeight(.semibold)
-                .disabled(!vm.canReserve)
+            } else {
+                Button {
+                } label: {
+                    Text("Reserve Now")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .fontWeight(.semibold)
+                .disabled(true)
             }
-            .padding()
-            .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
-
+        .padding()
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+    
     private func detailsRow(title: String, value: String, systemImage: String) -> some View {
         HStack {
             Label(title, systemImage: systemImage)

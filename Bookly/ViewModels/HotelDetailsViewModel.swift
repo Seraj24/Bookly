@@ -11,7 +11,7 @@ import CoreData
 
 final class HotelDetailsViewModel: ObservableObject {
 
-    private let hotel: Hotel
+    let hotel: Hotel
     
     @Published var selectedRoom: Room?
     @Published var selectedQuantity: Int = 1
@@ -37,11 +37,11 @@ final class HotelDetailsViewModel: ObservableObject {
     }
 
     var priceText: String {
-        if hotel.responds(to: Selector(("pricePerNight"))) {
-            return "Price unavailable"
-        } else {
-            return "Price unavailable"
+        guard let price = selectedRoom?.price else {
+            return "No room selected"
         }
+        
+        return String(format: "$%.0f", price)
     }
 
     var shortDescription: String {
@@ -55,8 +55,8 @@ final class HotelDetailsViewModel: ObservableObject {
     }
     
     var rooms: [Room] {
-        
-        return (hotel.rooms as? Set<Room>)?.sorted { $0.roomType ?? "" < $1.roomType ?? "" } ?? []
+        return (hotel.rooms as? Set<Room>)?
+            .sorted { $0.price < $1.price } ?? []
     }
     
     var canReserve: Bool {

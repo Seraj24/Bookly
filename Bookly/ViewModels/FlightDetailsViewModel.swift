@@ -11,7 +11,7 @@ import CoreData
 
 final class FlightDetailsViewModel: ObservableObject {
     
-    private let flight: Flight
+    let flight: Flight
     private var holder: BooklyHolder?
     private var context: NSManagedObjectContext?
     

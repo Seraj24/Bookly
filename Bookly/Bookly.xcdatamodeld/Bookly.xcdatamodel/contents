@@ -55,8 +55,9 @@
         <relationship name="rooms" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Room" inverseName="hotel" inverseEntity="Room"/>
     </entity>
     <entity name="Room" representedClassName="Room" syncable="YES" codeGenerationType="class">
+        <attribute name="price" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="quantity" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="roomType" optional="YES" attributeType="String"/>
+        <attribute name="roomType" attributeType="String"/>
         <relationship name="hotel" maxCount="1" deletionRule="Cascade" destinationEntity="Hotel" inverseName="rooms" inverseEntity="Hotel"/>
     </entity>
 </model>

@@ -591,14 +591,18 @@ final class BooklyHolder: ObservableObject {
         saveContext(context)
     }
     
+    
+    // MARK: - Room CRUD
     func updateRoom(
         room: Room,
         roomType: String,
+        roomPrice: Double,
         quantity: Int32,
         hotel: Hotel?,
         _ context: NSManagedObjectContext
     ) {
         room.roomType = roomType.trimmingCharacters(in: .whitespacesAndNewlines)
+        room.price = roomPrice
         room.quantity = quantity
         room.hotel = hotel
 

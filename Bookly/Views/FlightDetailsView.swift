@@ -247,33 +247,47 @@ struct FlightDetailsView: View {
                         .font(.subheadline)
                         .fontWeight(.semibold)
                 }
-            }
-            
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Total Price")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Total Price")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        
+                        Text(vm.totalPriceText)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                    }
                     
-                    Text(vm.totalPriceText)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                    Spacer()
                 }
                 
-                Spacer()
+                NavigationLink {
+                    FlightBookingView(
+                        vm: FlightBookingViewModel(
+                            selection: FlightBookingSelection(
+                                flight: vm.flight,
+                                cabin: selectedCabin,
+                                passengerCount: vm.selectedSeatCount
+                            )
+                        )
+                    )
+                } label: {
+                    Text("Book Flight")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .fontWeight(.semibold)
+            } else {
+                Button {
+                } label: {
+                    Text("Book Flight")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .fontWeight(.semibold)
+                .disabled(true)
             }
-            
-            Button {
-                print("Book flight tapped")
-                print("Cabin: \(vm.selectedCabin?.cabinClass ?? "None")")
-                print("Seats: \(vm.selectedSeatCount)")
-            } label: {
-                Text("Book Flight")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .fontWeight(.semibold)
-            .disabled(!vm.canBook)
         }
         .padding()
         .background(Color(.systemBackground))
