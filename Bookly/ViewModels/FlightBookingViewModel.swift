@@ -12,10 +12,16 @@ final class FlightBookingViewModel: ObservableObject {
     
     let selection: FlightBookingSelection
     
+    private var authService = AuthService.shared
+    
     @Published var firstName: String = ""
     @Published var lastName: String = ""
     @Published var email: String = ""
     @Published var phoneNumber: String = ""
+    
+    @Published var createdBooking: FlightBooking?
+    @Published var bookingErrorMessage: String?
+    @Published var isSubmitting = false
     
     init(selection: FlightBookingSelection) {
         self.selection = selection
@@ -99,6 +105,55 @@ final class FlightBookingViewModel: ObservableObject {
         !firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !lastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    func createBooking() {
+        guard let userId = authService.currentUser?.id else {
+            bookingErrorMessage = "No signed-in user was found."
+            return
+        }
+        
+        isSubmitting = true
+        bookingErrorMessage = nil
+        
+        let flight = selection.flight
+        let cabin = selection.cabin
+        
+        let newBooking = FlightBooking(
+            id: UUID().uuidString,
+            userId: userId,
+            flightId: flight.id,
+            airlineName: flight.airline?.airlineName ?? "Unknown Airline",
+            departureCode: flight.departureAirport?.code ?? "Unknown",
+            arrivalCode: flight.arrivalAirport?.code ?? "Unknown",
+            departureTime: flight.departureTime,
+            arrivalTime: flight.arrivalTime,
+            cabinClass: cabin.cabinClass ?? "Unknown Cabin",
+            cabinPrice: cabin.price,
+            passengerCount: selection.passengerCount,
+            guestFirstName: firstName,
+            guestLastName: lastName,
+            email: email,
+            phoneNumber: phoneNumber,
+            subtotal: subtotal,
+            taxes: taxesAndFees,
+            total: total,
+            status: .pending,
+            createdAt: Date()
+        )
+        
+        authService.createFlightBooking(newBooking) { result in
+            DispatchQueue.main.async {
+                self.isSubmitting = false
+                
+                switch result {
+                case .success:
+                    self.createdBooking = newBooking
+                case .failure(let error):
+                    self.bookingErrorMessage = error.localizedDescription
+                }
+            }
+        }
     }
     
     private func formatTime(_ date: Date?) -> String {

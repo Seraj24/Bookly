@@ -13,6 +13,8 @@ final class HotelDetailsViewModel: ObservableObject {
 
     let hotel: Hotel
     
+    private var authService = AuthService.shared
+    
     @Published var selectedRoom: Room?
     @Published var selectedQuantity: Int = 1
     
@@ -66,6 +68,26 @@ final class HotelDetailsViewModel: ObservableObject {
 
     var maxSelectableQuantity: Int {
         Int(selectedRoom?.quantity ?? 1)
+        
+    }
+    
+    var isGuest: Bool {
+        authService.isGuest || authService.currentUser == nil
+        
+    }
+
+    var shouldShowSignInPrompt: Bool {
+        isGuest
+        
+    }
+
+    var signInPromptText: String {
+        "You need to sign in before reserving a hotel."
+        
+    }
+
+    var canProceedToBooking: Bool {
+        !isGuest && selectedRoom != nil
         
     }
 

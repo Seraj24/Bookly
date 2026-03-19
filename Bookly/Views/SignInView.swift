@@ -12,6 +12,8 @@ struct SignInView: View {
     @EnvironmentObject private var holder: BooklyHolder
     @Environment(\.managedObjectContext) private var context
     
+    @Environment(\.dismiss) private var dismiss
+    
     @StateObject private var vm: SignInViewModel = SignInViewModel()
 
     
@@ -103,6 +105,9 @@ struct SignInView: View {
     private var signInButton: some View {
         Button {
             vm.signInTapped()
+            if (vm.errorMessage == nil) {
+                dismiss()
+            }
         } label: {
             Label("Sign In", systemImage: "airplane.arrival")
                 .frame(maxWidth: .infinity)

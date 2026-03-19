@@ -23,12 +23,24 @@ struct FlightBookingView: View {
                 travelerDetailsCard
                 fareSummaryCard
                 confirmButton
+                
+                Text("canConfirm: \(vm.canConfirm.description)")
+                Text("isSubmitting: \(vm.isSubmitting.description)")
+                Text("createdBooking exists: \((vm.createdBooking != nil).description)")
+                Text("error: \(vm.bookingErrorMessage ?? "none")")
+                    .foregroundStyle(.red)
             }
             .padding()
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Booking")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(item: $vm.createdBooking) { booking in
+            FlightBookingSummaryView(
+                booking: booking,
+                errorMessage: vm.bookingErrorMessage
+            )
+        }
     }
     
     private var flightSummaryCard: some View {
@@ -194,19 +206,21 @@ struct FlightBookingView: View {
     
     private var confirmButton: some View {
         Button {
-            print("Confirm flight booking")
-            print("Airline: \(vm.airlineText)")
-            print("Cabin: \(vm.cabinText)")
-            print("Passengers: \(vm.passengerCountText)")
-            print("Traveler: \(vm.firstName) \(vm.lastName)")
-            print("Total: \(vm.totalText)")
+            print("Confirm button tapped")
+            print("canConfirm =", vm.canConfirm)
+            vm.createBooking()
         } label: {
-            Text("Confirm Booking")
-                .frame(maxWidth: .infinity)
+            if vm.isSubmitting {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+            } else {
+                Text("Confirm Booking")
+                    .frame(maxWidth: .infinity)
+            }
         }
         .buttonStyle(.borderedProminent)
         .fontWeight(.semibold)
-        .disabled(!vm.canConfirm)
+        .disabled(!vm.canConfirm || vm.isSubmitting)
         .padding(.bottom, 8)
     }
     

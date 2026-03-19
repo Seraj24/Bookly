@@ -235,33 +235,49 @@ struct FlightDetailsView: View {
     
     private var bookingCard: some View {
         VStack(spacing: 14) {
-            if let selectedCabin = vm.selectedCabin {
+            if vm.shouldShowSignInPrompt {
+                VStack(spacing: 12) {
+                    Text(vm.signInPromptText)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+
+                    NavigationLink {
+                        SignInView()
+                    } label: {
+                        Text("Sign In")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .fontWeight(.semibold)
+                }
+            } else if let selectedCabin = vm.selectedCabin {
                 HStack {
                     Text("Selected")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    
+
                     Spacer()
-                    
+
                     Text("\(selectedCabin.cabinClass ?? "Unknown Cabin") × \(vm.selectedSeatCount)")
                         .font(.subheadline)
                         .fontWeight(.semibold)
                 }
-                
+
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Total Price")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        
+
                         Text(vm.totalPriceText)
                             .font(.title2)
                             .fontWeight(.bold)
                     }
-                    
+
                     Spacer()
                 }
-                
+
                 NavigationLink {
                     FlightBookingView(
                         vm: FlightBookingViewModel(
@@ -278,6 +294,7 @@ struct FlightDetailsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .fontWeight(.semibold)
+                .disabled(!vm.canProceedToBooking)
             } else {
                 Button {
                 } label: {

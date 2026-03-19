@@ -12,6 +12,8 @@ final class HotelBookingViewModel: ObservableObject {
     
     let selection: HotelBookingSelection
     
+    private var authService = AuthService.shared
+    
     @Published var guestFirstName: String = ""
     @Published var guestLastName: String = ""
     @Published var email: String = ""
@@ -19,6 +21,10 @@ final class HotelBookingViewModel: ObservableObject {
     
     @Published var checkInDate: Date = Date()
     @Published var checkOutDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
+    
+    @Published var createdBooking: HotelBooking?
+    @Published var bookingErrorMessage: String?
+    @Published var isSubmitting = false
     
     init(selection: HotelBookingSelection) {
         self.selection = selection
@@ -82,6 +88,54 @@ final class HotelBookingViewModel: ObservableObject {
         !guestLastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         checkOutDate > checkInDate
+    }
+    
+    func createBooking() {
+        guard let userId = authService.currentUser?.id else {
+            bookingErrorMessage = "No signed-in user was found."
+            return
+        }
+        
+        isSubmitting = true
+        bookingErrorMessage = nil
+        
+        let hotel = selection.hotel
+        let room = selection.room
+        
+        let newBooking = HotelBooking(
+            id: UUID().uuidString,
+            userId: userId,
+            hotelId: hotel.id,
+            hotelName: hotel.name ?? "Unknown Hotel",
+            city: hotel.destination?.city ?? "Unknown City",
+            roomType: room.roomType ?? "Unknown Room",
+            roomPrice: room.price,
+            quantity: selection.quantity,
+            checkInDate: checkInDate,
+            checkOutDate: checkOutDate,
+            guestFirstName: guestFirstName,
+            guestLastName: guestLastName,
+            email: email,
+            phoneNumber: phoneNumber,
+            subtotal: subtotal,
+            taxes: taxes,
+            total: total,
+            status: .pending,
+            createdAt: Date()
+        )
+        
+        authService.createHotelBooking(newBooking) { result in
+            DispatchQueue.main.async {
+                self.isSubmitting = false
+                
+                switch result {
+                case .success:
+                    self.createdBooking = newBooking
+                case .failure(let error):
+                    self.bookingErrorMessage = error.localizedDescription
+                }
+            }
+        }
     }
 }
 

@@ -29,6 +29,13 @@ struct HotelBookingView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Booking")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(item: $vm.createdBooking) { booking in
+            HotelBookingSummaryView(
+                booking: booking,
+                errorMessage: vm.bookingErrorMessage
+            )
+            
+        }
     }
     
     private var hotelSummaryCard: some View {
@@ -153,21 +160,21 @@ struct HotelBookingView: View {
     
     private var confirmButton: some View {
         Button {
-            print("Confirm hotel booking")
-            print("Hotel: \(vm.hotelName)")
-            print("Room: \(vm.roomTypeText)")
-            print("Quantity: \(vm.selection.quantity)")
-            print("Check-in: \(vm.checkInDate)")
-            print("Check-out: \(vm.checkOutDate)")
-            print("Guest: \(vm.guestFirstName) \(vm.guestLastName)")
+            vm.createBooking()
         } label: {
-            Text("Confirm Booking")
-                .frame(maxWidth: .infinity)
+            if vm.isSubmitting {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+            } else {
+                Text("Confirm Booking")
+                    .frame(maxWidth: .infinity)
+            }
         }
         .buttonStyle(.borderedProminent)
         .fontWeight(.semibold)
-        .disabled(!vm.canConfirm)
+        .disabled(!vm.canConfirm || vm.isSubmitting)
         .padding(.bottom, 8)
+        
     }
     
     private func summaryRow(_ title: String, _ value: String) -> some View {

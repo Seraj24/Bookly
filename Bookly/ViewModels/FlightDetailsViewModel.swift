@@ -12,6 +12,7 @@ import CoreData
 final class FlightDetailsViewModel: ObservableObject {
     
     let flight: Flight
+    private var authService = AuthService.shared
     private var holder: BooklyHolder?
     private var context: NSManagedObjectContext?
     
@@ -103,6 +104,25 @@ final class FlightDetailsViewModel: ObservableObject {
     
     var maxSelectableSeats: Int {
         Int(selectedCabin?.remainingSeats ?? 1)
+    }
+    
+    var isGuest: Bool {
+        authService.isGuest || authService.currentUser == nil
+        
+    }
+
+    var shouldShowSignInPrompt: Bool {
+        isGuest
+        
+    }
+
+    var signInPromptText: String {
+        "You need to sign in before booking a flight."
+        
+    }
+
+    var canProceedToBooking: Bool {
+        !isGuest && selectedCabin != nil
     }
     
     func selectCabin(_ cabin: Cabin) {

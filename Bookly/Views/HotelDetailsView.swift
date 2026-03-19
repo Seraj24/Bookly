@@ -189,7 +189,23 @@ struct HotelDetailsView: View {
 
     private var bookingCard: some View {
         VStack(spacing: 12) {
-            if let selectedRoom = vm.selectedRoom {
+            if vm.shouldShowSignInPrompt {
+                VStack(spacing: 12) {
+                    Text(vm.signInPromptText)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+
+                    NavigationLink {
+                        SignInView()
+                    } label: {
+                        Text("Sign In")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .fontWeight(.semibold)
+                }
+            } else if let selectedRoom = vm.selectedRoom {
                 HStack {
                     Text("Selected")
                         .foregroundStyle(.secondary)
@@ -217,6 +233,7 @@ struct HotelDetailsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .fontWeight(.semibold)
+                .disabled(!vm.canProceedToBooking)
             } else {
                 Button {
                 } label: {
