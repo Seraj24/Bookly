@@ -17,9 +17,6 @@ struct FlightSearchView: View {
     @State private var showDatePicker = false
     @State private var showPassengersSheet = false
     @FocusState private var focusedField: ActiveField?
-
-    @State private var pickingField: PickingField = .departure
-    private enum PickingField { case departure, `return` }
     
     init(
         showHeader: Bool = true,
@@ -95,37 +92,19 @@ struct FlightSearchView: View {
                     Divider()
 
                     HStack {
-                        Label("Departure", systemImage: "calendar")
+                        Label("Dates", systemImage: "calendar")
                             .foregroundStyle(.secondary)
 
                         Spacer()
-
-                        Text(vm.departureDateText)
-                            .foregroundStyle(Color("PrimaryColor"))
-                            .onTapGesture {
-                                pickingField = .departure
-                                showDatePicker = true
-                            }
+                        
+                        
+                        Text("\(vm.departureDateText) - \(vm.returnDateText)")
+                            .lineLimit(1)
                     }
-
-                    if vm.tripType == .roundTrip {
-                        Divider()
-
-                        HStack {
-                            Label("Return", systemImage: "calendar")
-                                .foregroundStyle(.secondary)
-
-                            Spacer()
-
-                            Text(vm.returnDateText)
-                                .foregroundStyle(Color("PrimaryColor"))
-                                .onTapGesture {
-                                    pickingField = .return
-                                    showDatePicker = true
-                                }
-                        }
+                    .onTapGesture {
+                        showDatePicker = true
                     }
-
+                    
                     Divider()
 
                     Button {
@@ -185,13 +164,53 @@ struct FlightSearchView: View {
         }
         .sheet(isPresented: $showDatePicker) {
             VStack(spacing: 16) {
-                DatePicker(
-                    pickingField == .departure ? "Select departure" : "Select return",
-                    selection: bindingForPicker(pickingField),
-                    displayedComponents: .date
-                )
-                .datePickerStyle(.graphical)
-                .padding()
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Departure")
+                        .font(.headline)
+
+                    DatePicker(
+                        "Departure",
+                        selection: Binding(
+                            get: { vm.departureDate ?? .now },
+                            set: { newValue in
+                                vm.departureDate = newValue
+
+                                if vm.tripType == .roundTrip {
+                                    if let returnDate = vm.returnDate, returnDate < newValue {
+                                        vm.returnDate = newValue
+                                    } else if vm.returnDate == nil {
+                                        vm.returnDate = newValue
+                                    }
+                                }
+                            }
+                        ),
+                        in: Date()...,
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.graphical)
+                    .labelsHidden()
+                }
+
+                if vm.tripType == .roundTrip {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Return")
+                            .font(.headline)
+
+                        DatePicker(
+                            "Return",
+                            selection: Binding(
+                                get: { vm.returnDate ?? vm.departureDate ?? .now },
+                                set: { newValue in
+                                    vm.returnDate = newValue
+                                }
+                            ),
+                            in: (vm.departureDate ?? Date())...,
+                            displayedComponents: .date
+                        )
+                        .datePickerStyle(.graphical)
+                        .labelsHidden()
+                    }
+                }
 
                 Button("Done") {
                     vm.normalizeFlightDatesIfNeeded()
@@ -199,37 +218,8 @@ struct FlightSearchView: View {
                 }
                 .buttonStyle(.borderedProminent)
             }
-            .presentationDetents([.medium])
+            .padding()
+            .presentationDetents([.large])
         }
-    }
-
-    private func bindingForPicker(_ field: PickingField) -> Binding<Date> {
-        Binding(
-            get: {
-                switch field {
-                case .departure:
-                    return vm.departureDate ?? .now
-                case .return:
-                    return vm.returnDate ?? vm.departureDate ?? .now
-                }
-            },
-            set: { newValue in
-                switch field {
-                case .departure:
-                    vm.departureDate = newValue
-
-                    if vm.tripType == .roundTrip {
-                        if let r = vm.returnDate, r < newValue {
-                            vm.returnDate = newValue
-                        } else if vm.returnDate == nil {
-                            vm.returnDate = newValue
-                        }
-                    }
-
-                case .return:
-                    vm.returnDate = newValue
-                }
-            }
-        )
     }
 }

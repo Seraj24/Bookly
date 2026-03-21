@@ -10,7 +10,8 @@ import Combine
 
 final class HotelSearchViewModel: ObservableObject {
     @Published var destination: String = ""
-    @Published var date: Date = .now
+    @Published var checkInDate: Date = .now
+    @Published var checkOutDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
     @Published var hotelGuests: Int = 1
     
     private var holder: BooklyHolder?
@@ -26,6 +27,14 @@ final class HotelSearchViewModel: ObservableObject {
             .map { $0.city ?? "" }
             .filter { !$0.isEmpty }
             .sorted()
+    }
+    
+    var checkInDateText: String {
+        checkInDate.formatted(date: .abbreviated, time: .omitted)
+    }
+    
+    var checkOutDateText: String {
+        checkOutDate.formatted(date: .abbreviated, time: .omitted)
     }
     
     var destinationSuggestions: [String] {
@@ -45,14 +54,15 @@ final class HotelSearchViewModel: ObservableObject {
         
         return HotelSearchRequest(
             destination: destination,
-            checkInDate: date,
-            checkOutDate: date,
+            checkInDate: checkInDate,
+            checkOutDate: checkOutDate,
         )
     }
     
     func clear() {
         destination = ""
-        date = .now
+        checkInDate = .now
+        checkOutDate = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
         hotelGuests = 1
     }
 }

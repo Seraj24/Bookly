@@ -65,11 +65,14 @@ struct HotelSearchView: View {
                     HStack {
                         Label("Dates", systemImage: "calendar")
                             .foregroundStyle(.secondary)
+                        
                         Spacer()
-
-                        Text(vm.date.formatted(date: .abbreviated, time: .omitted))
-                            .foregroundStyle(.blue)
-                            .onTapGesture { showHotelDatePicker = true }
+                        
+                        Text("\(vm.checkInDateText) - \(vm.checkOutDateText)")
+                            .lineLimit(1)
+                    }
+                    .onTapGesture {
+                        showHotelDatePicker = true
                     }
 
                     Divider()
@@ -124,18 +127,39 @@ struct HotelSearchView: View {
         }
         .sheet(isPresented: $showHotelDatePicker) {
             VStack(spacing: 16) {
-                DatePicker(
-                    "Select date",
-                    selection: $vm.date,
-                    displayedComponents: .date
-                )
-                .datePickerStyle(.graphical)
-                .padding()
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Check-in")
+                        .font(.headline)
+
+                    DatePicker(
+                        "Check-in",
+                        selection: $vm.checkInDate,
+                        in: Date()...,
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.graphical)
+                    .labelsHidden()
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Check-out")
+                        .font(.headline)
+
+                    DatePicker(
+                        "Check-out",
+                        selection: $vm.checkOutDate,
+                        in: vm.checkInDate...,
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.graphical)
+                    .labelsHidden()
+                }
 
                 Button("Done") { showHotelDatePicker = false }
                     .buttonStyle(.borderedProminent)
             }
-            .presentationDetents([.medium])
+            .padding()
+            .presentationDetents([.large])
         }
         .sheet(isPresented: $showHotelGuestsSheet) {
             CountSelector(
