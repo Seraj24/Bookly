@@ -13,48 +13,66 @@ final class FlightSearchViewModel: ObservableObject {
     @Published var toCity: String = ""
     
     @Published var tripType: TripType = .roundTrip
-    @Published var departureDate: Date? = nil
+    @Published var departureDate: Date = .now
     @Published var returnDate: Date? = nil
     @Published var flightPassengers: Int = 1
     
     private var holder: BooklyHolder?
-    
+    private var cachedAirports: [String] = []
+
     func configure(holder: BooklyHolder) {
-        self.holder = holder
-    }
-    
-    var airports: [String] {
-        guard let holder else { return [] }
+        guard self.holder == nil else { return }
         
-        return holder.airports
-            .map { airport in
-                let name = airport.name ?? ""
-                let code = airport.code ?? ""
+        self.holder = holder
+        self.cachedAirports = holder.airports
+            .compactMap { airport in
+                let name = (airport.name ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                let code = (airport.code ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
                 
                 if !name.isEmpty && !code.isEmpty {
                     return "\(name) (\(code))"
-                } else {
+                } else if !name.isEmpty {
                     return name
+                } else {
+                    return nil
                 }
             }
-            .filter { !$0.isEmpty }
             .sorted()
+        
     }
-    
+
+    var airports: [String] {
+        cachedAirports
+    }
+
     var airportsSuggestionsFrom: [String] {
-        let trimmed = fromCity.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard !trimmed.isEmpty else { return Array(airports.prefix(6)) }
-        return airports.filter { $0.lowercased().hasPrefix(trimmed) }
+        filteredSuggestions(for: fromCity)
+        
     }
-    
+
     var airportsSuggestionsTo: [String] {
-        let trimmed = toCity.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard !trimmed.isEmpty else { return Array(airports.prefix(6)) }
-        return airports.filter { $0.lowercased().hasPrefix(trimmed) }
+        filteredSuggestions(for: toCity)
+        
+    }
+
+    private func filteredSuggestions(for text: String) -> [String] {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard !trimmed.isEmpty else {
+            return Array(cachedAirports.prefix(6))
+        }
+        
+        let lowercasedQuery = trimmed.lowercased()
+        
+        return cachedAirports
+            .filter { $0.lowercased().hasPrefix(lowercasedQuery) }
+            .prefix(6)
+            .map { $0 }
+        
     }
     
     var departureDateText: String {
-        departureDate?.formatted(date: .abbreviated, time: .omitted) ?? "Select"
+        departureDate.formatted(date: .abbreviated, time: .omitted)
     }
     
     var returnDateText: String {
@@ -73,31 +91,28 @@ final class FlightSearchViewModel: ObservableObject {
             !toTrimmed.isEmpty &&
             airports.contains { $0.lowercased() == toTrimmed }
         
-        let dateOk = departureDate != nil
         let returnOk = (tripType == .oneWay) || (returnDate != nil)
         
         let orderOk: Bool = {
             guard tripType == .roundTrip,
-                  let d = departureDate,
                   let r = returnDate else { return true }
-            return r >= d
+            return r >= departureDate
         }()
         
-        return departureOk && arrivalOk && dateOk && returnOk && orderOk
+        return departureOk && arrivalOk && returnOk && orderOk
     }
     
     func normalizeFlightDatesIfNeeded() {
         guard tripType == .roundTrip,
-              let d = departureDate,
               let r = returnDate else { return }
         
-        if r < d {
-            returnDate = d
+        if r < departureDate {
+            returnDate = departureDate
         }
     }
     
     func makeRequest() -> FlightSearchRequest? {
-        guard canSearchFlights, let departureDate else { return nil }
+        guard canSearchFlights else { return nil }
         
         return FlightSearchRequest(
             fromCity: fromCity,
@@ -111,7 +126,7 @@ final class FlightSearchViewModel: ObservableObject {
     func clear() {
         fromCity = ""
         toCity = ""
-        departureDate = nil
+        departureDate = .now
         returnDate = nil
         flightPassengers = 1
         tripType = .roundTrip

@@ -26,6 +26,7 @@ struct SearchSuggestionField<Field: Hashable>: View {
 
                 TextField(placeholder, text: $text)
                     .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
                     .focused(focusedField, equals: field)
 
                 Spacer()

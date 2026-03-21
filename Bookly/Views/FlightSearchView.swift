@@ -54,8 +54,8 @@ struct FlightSearchView: View {
                     .onChange(of: vm.tripType) { _, newValue in
                         if newValue == .oneWay {
                             vm.returnDate = nil
-                        } else if vm.returnDate == nil, let d = vm.departureDate {
-                            vm.returnDate = d
+                        } else if vm.returnDate == nil {
+                            vm.returnDate = vm.departureDate
                         }
                     }
 
@@ -92,13 +92,16 @@ struct FlightSearchView: View {
                     Divider()
 
                     HStack {
-                        Label("Dates", systemImage: "calendar")
+                        let dateText = vm.tripType == .oneWay ? "Departure Date" : "Dates"
+                        
+                        Label(dateText, systemImage: "calendar")
                             .foregroundStyle(.secondary)
 
                         Spacer()
                         
+                        let returnDate = vm.tripType == .oneWay ? "" : " - \(vm.returnDateText)"
                         
-                        Text("\(vm.departureDateText) - \(vm.returnDateText)")
+                        Text("\(vm.departureDateText)\(returnDate)")
                             .lineLimit(1)
                     }
                     .onTapGesture {
@@ -155,6 +158,9 @@ struct FlightSearchView: View {
         .onAppear {
             vm.configure(holder: holder)
         }
+        .onDisappear {
+            focusedField = nil
+        }
         .sheet(isPresented: $showPassengersSheet) {
             CountSelector(
                 title: "Passengers",
@@ -171,7 +177,7 @@ struct FlightSearchView: View {
                     DatePicker(
                         "Departure",
                         selection: Binding(
-                            get: { vm.departureDate ?? .now },
+                            get: { vm.departureDate},
                             set: { newValue in
                                 vm.departureDate = newValue
 
