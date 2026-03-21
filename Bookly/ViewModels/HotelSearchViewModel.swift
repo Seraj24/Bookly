@@ -38,9 +38,16 @@ final class HotelSearchViewModel: ObservableObject {
         !destination.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
-    func makeDestination() -> String? {
-        let trimmed = destination.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
+    func makeRequest() -> HotelSearchRequest? {
+        guard canSearchHotels else { return nil }
+        
+        let destination = self.destination.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        return HotelSearchRequest(
+            destination: destination,
+            checkInDate: date,
+            checkOutDate: date,
+        )
     }
     
     func clear() {

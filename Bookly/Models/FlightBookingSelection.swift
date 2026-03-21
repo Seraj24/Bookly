@@ -12,4 +12,5 @@ struct FlightBookingSelection {
     let flight: Flight
     let cabin: Cabin
     let passengerCount: Int
+    let departureDate: Date
 }

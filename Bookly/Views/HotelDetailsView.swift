@@ -10,23 +10,30 @@ import SwiftUI
 struct HotelDetailsView: View {
 
     @StateObject private var vm: HotelDetailsViewModel
-
-    init(vm: HotelDetailsViewModel) {
-        _vm = StateObject(wrappedValue: vm)
+    @ObservedObject private var auth = AuthService.shared
+    
+    init(hotel: Hotel, request: HotelSearchRequest) {
+        _vm = StateObject(
+            wrappedValue: HotelDetailsViewModel(
+                hotel: hotel,
+                checkInDate: request.checkInDate,
+                checkOutDate: request.checkOutDate
+            )
+        )
     }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-
+                
                 headerImage
-
+                
                 summaryCard
-
+                
                 detailsCard
                 
                 roomType
-
+                
                 bookingCard
             }
             .padding()
@@ -34,6 +41,9 @@ struct HotelDetailsView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Hotel Details")
         .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: auth.currentUser?.id) { _ in
+            vm.refreshAuthState()
+        }
     }
 
     private var headerImage: some View {
@@ -85,23 +95,23 @@ struct HotelDetailsView: View {
 
     private var detailsCard: some View {
         VStack(spacing: 12) {
-
+            
             detailsRow(
                 title: "Price",
                 value: vm.priceText,
                 systemImage: "dollarsign.circle"
             )
-
+            
             Divider()
-
+            
             detailsRow(
                 title: "Rating",
                 value: vm.ratingText,
                 systemImage: "star"
             )
-
+            
             Divider()
-
+            
             detailsRow(
                 title: "Location",
                 value: vm.city,
@@ -114,6 +124,30 @@ struct HotelDetailsView: View {
                 title: "Address",
                 value: vm.address,
                 systemImage: "mappin"
+            )
+            
+            Divider()
+            
+            detailsRow(
+                title: "Check-in",
+                value: vm.checkInDate.formatted(date: .abbreviated, time: .omitted),
+                systemImage: "calendar"
+            )
+            
+            Divider()
+            
+            detailsRow(
+                title: "Check-out",
+                value: vm.checkOutDate.formatted(date: .abbreviated, time: .omitted),
+                systemImage: "calendar"
+            )
+            
+            Divider()
+            
+            detailsRow(
+                title: "Stay",
+                value: vm.stayDurationText,
+                systemImage: "moon"
             )
         }
         .padding()
@@ -223,7 +257,9 @@ struct HotelDetailsView: View {
                             selection: HotelBookingSelection(
                                 hotel: vm.hotel,
                                 room: selectedRoom,
-                                quantity: vm.selectedQuantity
+                                quantity: vm.selectedQuantity,
+                                checkIn: vm.checkInDate,
+                                checkOut: vm.checkOutDate
                             )
                         )
                     )

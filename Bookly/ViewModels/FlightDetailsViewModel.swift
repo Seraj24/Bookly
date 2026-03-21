@@ -12,6 +12,7 @@ import CoreData
 final class FlightDetailsViewModel: ObservableObject {
     
     let flight: Flight
+    let departureDate: Date
     private var authService = AuthService.shared
     private var holder: BooklyHolder?
     private var context: NSManagedObjectContext?
@@ -20,8 +21,9 @@ final class FlightDetailsViewModel: ObservableObject {
     @Published var selectedCabin: Cabin?
     @Published var selectedSeatCount: Int = 1
     
-    init(flight: Flight) {
+    init(flight: Flight, departureDate: Date) {
         self.flight = flight
+        self.departureDate = departureDate
     }
     
     func configure(holder: BooklyHolder, context: NSManagedObjectContext) {
@@ -43,6 +45,10 @@ final class FlightDetailsViewModel: ObservableObject {
         }
     }
     
+    func refreshAuthState() {
+        objectWillChange.send()
+    }
+    
     var airlineText: String {
         flight.airline?.airlineName ?? "Unknown Airline"
     }
@@ -60,6 +66,10 @@ final class FlightDetailsViewModel: ObservableObject {
         guard let cabin = selectedCabin else { return "N/A" }
         let total = cabin.price * Double(selectedSeatCount)
         return String(format: "$%.0f", total)
+    }
+    
+    var selectedDateText: String {
+        departureDate.formatted(date: .abbreviated, time: .omitted)
     }
     
     var departureTimeText: String {

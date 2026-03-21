@@ -15,11 +15,15 @@ final class HotelDetailsViewModel: ObservableObject {
     
     private var authService = AuthService.shared
     
+    @Published var checkInDate: Date
+    @Published var checkOutDate: Date
     @Published var selectedRoom: Room?
     @Published var selectedQuantity: Int = 1
     
-    init(hotel: Hotel) {
+    init(hotel: Hotel, checkInDate: Date, checkOutDate: Date) {
         self.hotel = hotel
+        self.checkInDate = checkInDate
+        self.checkOutDate = checkOutDate
     }
 
     var name: String {
@@ -45,7 +49,18 @@ final class HotelDetailsViewModel: ObservableObject {
         
         return String(format: "$%.0f", price)
     }
-
+    
+    var stayDurationText: String {
+        let days = Calendar.current.dateComponents(
+            [.day],
+            from: checkInDate,
+            to: checkOutDate
+        ).day ?? 1
+        
+        return "\(days) night\(days == 1 ? "" : "s")"
+        
+    }
+    
     var shortDescription: String {
         let description = hotel.hotelDescription?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         
@@ -69,6 +84,10 @@ final class HotelDetailsViewModel: ObservableObject {
     var maxSelectableQuantity: Int {
         Int(selectedRoom?.quantity ?? 1)
         
+    }
+    
+    func refreshAuthState() {
+        objectWillChange.send()
     }
     
     var isGuest: Bool {

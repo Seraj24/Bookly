@@ -11,7 +11,7 @@ struct HotelSearchView: View {
     @EnvironmentObject private var holder: BooklyHolder
     @StateObject private var vm = HotelSearchViewModel()
 
-    let onSearch: (String) -> Void
+    let onSearch: (HotelSearchRequest) -> Void
     let showHeader: Bool
 
     @State private var showHotelDatePicker = false
@@ -20,7 +20,7 @@ struct HotelSearchView: View {
     
     init(
         showHeader: Bool = true,
-        onSearch: @escaping (String) -> Void
+        onSearch: @escaping (HotelSearchRequest) -> Void
     ) {
         self.showHeader = showHeader
         self.onSearch = onSearch
@@ -90,8 +90,8 @@ struct HotelSearchView: View {
                     .buttonStyle(.plain)
 
                     Button {
-                        guard let destination = vm.makeDestination() else { return }
-                        onSearch(destination)
+                        guard let request = vm.makeRequest() else { return }
+                        onSearch(request)
                     } label: {
                         Text("Search")
                             .frame(maxWidth: .infinity)

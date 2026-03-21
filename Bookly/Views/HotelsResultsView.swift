@@ -9,15 +9,13 @@ import SwiftUI
 
 struct HotelsResultsView: View {
     
-    let destination: String
     
     @EnvironmentObject private var holder: BooklyHolder
     
     @StateObject private var vm: HotelsResultsViewModel
     
-    init(destination: String) {
-        self.destination = destination
-        _vm = StateObject(wrappedValue: HotelsResultsViewModel(destination: destination))
+    init(request: HotelSearchRequest) {
+        _vm = StateObject(wrappedValue: HotelsResultsViewModel(request: request))
         
     }
     
@@ -30,13 +28,14 @@ struct HotelsResultsView: View {
                     description: Text("Try a different city.")
                 )
             } else {
-                Section("Results in \(destination.isEmpty ? "All Cities" : destination)") {
+                Section("Results in \(vm.request.destination.isEmpty ? "All Cities" : vm.request.destination)") {
                     
                     ForEach(vm.hotels) { hotel in
                         
                         NavigationLink {
                             HotelDetailsView(
-                                vm: HotelDetailsViewModel(hotel: hotel)
+                                hotel: hotel,
+                                request: vm.request
                             )
                         } label: {
                             HotelRow(hotel: hotel)
@@ -51,7 +50,7 @@ struct HotelsResultsView: View {
         .navigationTitle("Hotels")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            vm.setHotels(holder.hotels, destination: destination)
+            vm.setHotels(holder.hotels, destination: vm.request.destination)
         }
     }
 }

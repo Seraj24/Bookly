@@ -40,7 +40,7 @@ struct FlightsResultsView: View {
                     LazyVStack(spacing: 12) {
                         ForEach(vm.flights) { flight in
                             NavigationLink {
-                                FlightDetailsView(flight: flight)
+                                FlightDetailsView(flight: flight, request: vm.request)
                             } label: {
                                 FlightRow(flight: flight)
                             }

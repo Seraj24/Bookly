@@ -31,8 +31,8 @@ final class HomeViewModel: ObservableObject {
         selectedCategory = category
     }
     
-    func showHotels(destination: String) {
-        route = .hotels(destination: destination)
+    func showHotels(request: HotelSearchRequest) {
+        route = .hotels(request: request)
     }
     
     func showFlights(request: FlightSearchRequest) {

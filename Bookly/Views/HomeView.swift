@@ -48,8 +48,8 @@ struct HomeView: View {
                 categoryChips
                 
                 if vm.selectedCategory == .hotels {
-                    HotelSearchView(showHeader: false) { destination in
-                        vm.showHotels(destination: destination)
+                    HotelSearchView(showHeader: false) { request in
+                        vm.showHotels(request: request)
                     }
                 } else {
                     FlightSearchView(showHeader: false) { request in
@@ -69,8 +69,8 @@ struct HomeView: View {
         }
         .navigationDestination(item: $vm.route) { route in
             switch route {
-            case .hotels(let destination):
-                HotelsResultsView(destination: destination)
+            case .hotels(let request):
+                HotelsResultsView(request: request)
             case .flights(let request):
                 FlightsResultsView(request: request)
             case .account:
@@ -131,7 +131,7 @@ struct HomeView: View {
 }
 
 enum HomeRoute: Hashable, Identifiable {
-    case hotels(destination: String)
+    case hotels(request: HotelSearchRequest)
     case flights(request: FlightSearchRequest)
     case account
     

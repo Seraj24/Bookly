@@ -12,11 +12,14 @@ final class HotelsResultsViewModel: ObservableObject {
     
     @Published private(set) var hotels: [Hotel] = []
     
+    
+    let request: HotelSearchRequest
     private var allHotels: [Hotel] = []
     
-    init(destination: String, allHotels: [Hotel] = []) {
+    init(request: HotelSearchRequest, allHotels: [Hotel] = []) {
         self.allHotels = allHotels
-        applyFilter(destination: destination)
+        self.request = request
+        applyFilter(destination: request.destination)
     }
     
     func setHotels(_ hotels: [Hotel], destination: String) {

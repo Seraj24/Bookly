@@ -49,8 +49,8 @@ struct SearchView: View {
         .navigationDestination(item: $vm.route) { route in
             switch route {
             case .hotelSearch:
-                HotelSearchView { destination in
-                    vm.showHotelResults(destination: destination)
+                HotelSearchView { request in
+                    vm.showHotelResults(request: request)
                 }
                 
             case .flightSearch:
@@ -58,8 +58,8 @@ struct SearchView: View {
                     vm.showFlightResults(request: request)
                 }
                 
-            case .hotelResults(let destination):
-                HotelsResultsView(destination: destination)
+            case .hotelResults(let request):
+                HotelsResultsView(request: request)
                 
             case .flightResults(let request):
                 FlightsResultsView(request: request)

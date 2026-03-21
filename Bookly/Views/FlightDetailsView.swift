@@ -13,9 +13,16 @@ struct FlightDetailsView: View {
     @Environment(\.managedObjectContext) private var context
     
     @StateObject private var vm: FlightDetailsViewModel
+    @ObservedObject private var auth = AuthService.shared
     
-    init(flight: Flight) {
-        _vm = StateObject(wrappedValue: FlightDetailsViewModel(flight: flight))
+    init(flight: Flight, request: FlightSearchRequest) {
+        _vm = StateObject(
+            wrappedValue: FlightDetailsViewModel(
+                flight: flight,
+                departureDate: request.departureDate
+            )
+        )
+        
     }
     
     var body: some View {
@@ -34,6 +41,9 @@ struct FlightDetailsView: View {
         .background(Color(.systemGroupedBackground))
         .onAppear {
             vm.configure(holder: holder, context: context)
+        }
+        .onChange(of: auth.currentUser?.id) { _ in
+            vm.refreshAuthState()
         }
     }
     
@@ -160,6 +170,8 @@ struct FlightDetailsView: View {
             Divider()
             detailsRow(title: "Duration", value: vm.durationText, systemImage: "clock")
             Divider()
+            detailsRow(title: "Departure Date", value: vm.selectedDateText, systemImage: "calendar")
+            Divider()
             detailsRow(title: "Stops", value: vm.stopsText, systemImage: "point.topleft.down.curvedto.point.bottomright.up")
         }
         .padding()
@@ -284,7 +296,8 @@ struct FlightDetailsView: View {
                             selection: FlightBookingSelection(
                                 flight: vm.flight,
                                 cabin: selectedCabin,
-                                passengerCount: vm.selectedSeatCount
+                                passengerCount: vm.selectedSeatCount,
+                                departureDate: vm.departureDate
                             )
                         )
                     )

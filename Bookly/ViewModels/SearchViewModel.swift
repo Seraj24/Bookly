@@ -11,7 +11,7 @@ import Combine
 enum SearchRoute: Hashable, Identifiable {
     case hotelSearch
     case flightSearch
-    case hotelResults(destination: String)
+    case hotelResults(request: HotelSearchRequest)
     case flightResults(request: FlightSearchRequest)
     
     var id: Self { self }
@@ -28,8 +28,8 @@ final class SearchViewModel: ObservableObject {
         route = .flightSearch
     }
     
-    func showHotelResults(destination: String) {
-        route = .hotelResults(destination: destination)
+    func showHotelResults(request: HotelSearchRequest) {
+        route = .hotelResults(request: request)
     }
     
     func showFlightResults(request: FlightSearchRequest) {

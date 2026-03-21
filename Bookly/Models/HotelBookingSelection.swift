@@ -12,4 +12,6 @@ struct HotelBookingSelection {
     let hotel: Hotel
     let room: Room
     let quantity: Int
+    let checkIn: Date
+    let checkOut: Date
 }
