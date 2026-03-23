@@ -17,6 +17,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         
         FirebaseApp.configure()
         
+        // Seed Database, if needed
+        Task {
+            do {
+                try await FirestoreBootstrapService.shared.uploadSeedDataIfNeeded()
+            } catch {
+                print("Firestore bootstrap failed: \(error.localizedDescription)")
+            }
+        }
+        
         return true
         
     }
@@ -29,13 +38,24 @@ struct BooklyApp: App {
     let persistenceController = PersistenceController.shared
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject private var holder: BooklyHolder
+    
+    init() {
+        let context = persistenceController.container.viewContext
+        _holder = StateObject(wrappedValue: BooklyHolder(context))
+        
+    }
     
     var body: some Scene {
         WindowGroup {
             let ctx = persistenceController.container.viewContext
             ContentView()
                 .environment(\.managedObjectContext, ctx)
-                .environmentObject(BooklyHolder(ctx))
+                .environmentObject(holder)
+                .task {
+                    let loader = BooklyDataLoader(context: ctx, holder: holder)
+                    await loader.loadInitialData()
+                }
         }
     }
 }

@@ -1,0 +1,585 @@
+{
+  "destinations": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "city": "Montreal",
+      "country": "Canada"
+    },
+    {
+      "id": "11111111-1111-4111-8111-111111111112",
+      "city": "Barcelona",
+      "country": "Spain"
+    },
+    {
+      "id": "11111111-1111-4111-8111-111111111113",
+      "city": "Toronto",
+      "country": "Canada"
+    },
+    {
+      "id": "11111111-1111-4111-8111-111111111114",
+      "city": "Vancouver",
+      "country": "Canada"
+    },
+    {
+      "id": "11111111-1111-4111-8111-111111111115",
+      "city": "Paris",
+      "country": "France"
+    },
+    {
+      "id": "11111111-1111-4111-8111-111111111116",
+      "city": "London",
+      "country": "United Kingdom"
+    },
+    {
+      "id": "11111111-1111-4111-8111-111111111117",
+      "city": "Dubai",
+      "country": "United Arab Emirates"
+    },
+    {
+      "id": "11111111-1111-4111-8111-111111111118",
+      "city": "New York",
+      "country": "United States"
+    }
+  ],
+  "airlines": [
+    {
+      "id": "22222222-2222-4222-8222-222222222221",
+      "airlineName": "Air Canada"
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "airlineName": "Vueling"
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222223",
+      "airlineName": "WestJet"
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222224",
+      "airlineName": "British Airways"
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222225",
+      "airlineName": "Emirates"
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222226",
+      "airlineName": "Air France"
+    }
+  ],
+  "airports": [
+    {
+      "id": "33333333-3333-4333-8333-333333333331",
+      "name": "Montr\u00e9al\u2013Trudeau International Airport",
+      "code": "YUL",
+      "destinationId": "11111111-1111-4111-8111-111111111111",
+      "latitude": 45.4706,
+      "longitude": -73.7408
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333332",
+      "name": "Barcelona\u2013El Prat Airport",
+      "code": "BCN",
+      "destinationId": "11111111-1111-4111-8111-111111111112",
+      "latitude": 41.2974,
+      "longitude": 2.0833
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "name": "Toronto Pearson International Airport",
+      "code": "YYZ",
+      "destinationId": "11111111-1111-4111-8111-111111111113",
+      "latitude": 43.6777,
+      "longitude": -79.6248
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333334",
+      "name": "Vancouver International Airport",
+      "code": "YVR",
+      "destinationId": "11111111-1111-4111-8111-111111111114",
+      "latitude": 49.1951,
+      "longitude": -123.1779
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333335",
+      "name": "Paris Charles de Gaulle Airport",
+      "code": "CDG",
+      "destinationId": "11111111-1111-4111-8111-111111111115",
+      "latitude": 49.0097,
+      "longitude": 2.5479
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333336",
+      "name": "London Heathrow Airport",
+      "code": "LHR",
+      "destinationId": "11111111-1111-4111-8111-111111111116",
+      "latitude": 51.47,
+      "longitude": -0.4543
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333337",
+      "name": "Dubai International Airport",
+      "code": "DXB",
+      "destinationId": "11111111-1111-4111-8111-111111111117",
+      "latitude": 25.2532,
+      "longitude": 55.3657
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333338",
+      "name": "John F. Kennedy International Airport",
+      "code": "JFK",
+      "destinationId": "11111111-1111-4111-8111-111111111118",
+      "latitude": 40.6413,
+      "longitude": -73.7781
+    }
+  ],
+  "hotels": [
+    {
+      "id": "44444444-4444-4444-8444-444444444441",
+      "name": "Hotel Arts Barcelona",
+      "hotelAddress": "Marina 19-21, 08005 Barcelona, Spain",
+      "hotelDescription": "Luxury seaside hotel overlooking Port Ol\u00edmpic with a landmark glass tower and upscale dining.",
+      "rating": 4.7,
+      "destinationId": "11111111-1111-4111-8111-111111111112",
+      "latitude": 41.3854,
+      "longitude": 2.1967,
+      "photoURL": "https://www.ritzcarlton.com/content/dam/the-ris/media-property/images/en/bcnrz/overview/bcnrz-exterior-0010-hor-clsc.jpg"
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444442",
+      "name": "Le Mount Stephen",
+      "hotelAddress": "1440 Drummond Street, Montreal, Quebec H3G 1V9, Canada",
+      "hotelDescription": "Elegant luxury hotel in Montreal's Golden Square Mile close to shopping, dining, and downtown attractions.",
+      "rating": 4.6,
+      "destinationId": "11111111-1111-4111-8111-111111111111",
+      "latitude": 45.4982,
+      "longitude": -73.5746,
+      "photoURL": "https://www.lemountstephen.com/images/home/hero/hero-1.jpg"
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444443",
+      "name": "Fairmont Royal York",
+      "hotelAddress": "100 Front Street W, Toronto, Ontario M5J 1E3, Canada",
+      "hotelDescription": "Historic landmark hotel in downtown Toronto directly across from Union Station.",
+      "rating": 4.5,
+      "destinationId": "11111111-1111-4111-8111-111111111113",
+      "latitude": 43.6454,
+      "longitude": -79.3819,
+      "photoURL": "https://www.fairmont.com/content/dam/corporate/fairmont/images/hotels/ryh/01-home-page/RYH_Exterior_1920x1080.jpg"
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "name": "Pan Pacific Vancouver",
+      "hotelAddress": "Suite 300-999 Canada Place, Vancouver, British Columbia V6C 3B5, Canada",
+      "hotelDescription": "Waterfront luxury hotel at Canada Place with harbor and mountain views.",
+      "rating": 4.5,
+      "destinationId": "11111111-1111-4111-8111-111111111114",
+      "latitude": 49.2886,
+      "longitude": -123.111,
+      "photoURL": "https://www.panpacific.com/content/dam/pphg-revamp/en/hotels/pp-vancouver/overview/gallery-exterior-facade-day.jpg"
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444445",
+      "name": "Pullman Paris Tour Eiffel",
+      "hotelAddress": "18 Avenue de Suffren, Entr\u00e9e au 22 rue Jean Rey, 75015 Paris, France",
+      "hotelDescription": "Modern upscale hotel near the Eiffel Tower with contemporary rooms and event spaces.",
+      "rating": 4.4,
+      "destinationId": "11111111-1111-4111-8111-111111111115",
+      "latitude": 48.8553,
+      "longitude": 2.2932,
+      "photoURL": "https://all.accor.com/hotel/7229/photos/7229_ho_00_p_1024x768.jpg"
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444446",
+      "name": "The Tower Hotel",
+      "hotelAddress": "St Katharine's Way, London E1W 1LD, United Kingdom",
+      "hotelDescription": "Popular riverside hotel with views of Tower Bridge and easy access to central London.",
+      "rating": 4.3,
+      "destinationId": "11111111-1111-4111-8111-111111111116",
+      "latitude": 51.5055,
+      "longitude": -0.0746,
+      "photoURL": "https://www.guoman.com/content/dam/guoman/hotels/the-tower/gallery/exterior-day.jpg"
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444447",
+      "name": "Atlantis The Palm",
+      "hotelAddress": "Crescent Rd, The Palm Jumeirah, Dubai, United Arab Emirates",
+      "hotelDescription": "Iconic resort on Palm Jumeirah with a private beach, large pools, and resort attractions.",
+      "rating": 4.7,
+      "destinationId": "11111111-1111-4111-8111-111111111117",
+      "latitude": 25.1304,
+      "longitude": 55.1171,
+      "photoURL": "https://www.atlantis.com/dam/global/atlantis/dubai/hotel/overview/hero/atlantis-the-palm-hero.jpg"
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444448",
+      "name": "The New Yorker Hotel",
+      "hotelAddress": "481 8th Avenue, New York, NY 10001, United States",
+      "hotelDescription": "Classic Midtown Manhattan hotel near Penn Station and Madison Square Garden.",
+      "rating": 4.2,
+      "destinationId": "11111111-1111-4111-8111-111111111118",
+      "latitude": 40.7527,
+      "longitude": -73.9935,
+      "photoURL": "https://www.newyorkerhotel.com/resourcefiles/homeimages/the-new-yorker-hotel-exterior.jpg"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "55555555-5555-4555-8555-010155555555",
+      "roomType": "Single",
+      "price": 180.0,
+      "quantity": 6,
+      "hotelId": "44444444-4444-4444-8444-444444444441"
+    },
+    {
+      "id": "55555555-5555-4555-8555-010255555555",
+      "roomType": "Double",
+      "price": 260.0,
+      "quantity": 8,
+      "hotelId": "44444444-4444-4444-8444-444444444441"
+    },
+    {
+      "id": "55555555-5555-4555-8555-010355555555",
+      "roomType": "Suite",
+      "price": 420.0,
+      "quantity": 2,
+      "hotelId": "44444444-4444-4444-8444-444444444441"
+    },
+    {
+      "id": "55555555-5555-4555-8555-020155555555",
+      "roomType": "Single",
+      "price": 220.0,
+      "quantity": 5,
+      "hotelId": "44444444-4444-4444-8444-444444444442"
+    },
+    {
+      "id": "55555555-5555-4555-8555-020255555555",
+      "roomType": "Double",
+      "price": 320.0,
+      "quantity": 10,
+      "hotelId": "44444444-4444-4444-8444-444444444442"
+    },
+    {
+      "id": "55555555-5555-4555-8555-020355555555",
+      "roomType": "Suite",
+      "price": 550.0,
+      "quantity": 3,
+      "hotelId": "44444444-4444-4444-8444-444444444442"
+    },
+    {
+      "id": "55555555-5555-4555-8555-030155555555",
+      "roomType": "Single",
+      "price": 200.0,
+      "quantity": 8,
+      "hotelId": "44444444-4444-4444-8444-444444444443"
+    },
+    {
+      "id": "55555555-5555-4555-8555-030255555555",
+      "roomType": "Double",
+      "price": 300.0,
+      "quantity": 12,
+      "hotelId": "44444444-4444-4444-8444-444444444443"
+    },
+    {
+      "id": "55555555-5555-4555-8555-030355555555",
+      "roomType": "Suite",
+      "price": 480.0,
+      "quantity": 4,
+      "hotelId": "44444444-4444-4444-8444-444444444443"
+    },
+    {
+      "id": "55555555-5555-4555-8555-040155555555",
+      "roomType": "Single",
+      "price": 210.0,
+      "quantity": 7,
+      "hotelId": "44444444-4444-4444-8444-444444444444"
+    },
+    {
+      "id": "55555555-5555-4555-8555-040255555555",
+      "roomType": "Double",
+      "price": 310.0,
+      "quantity": 11,
+      "hotelId": "44444444-4444-4444-8444-444444444444"
+    },
+    {
+      "id": "55555555-5555-4555-8555-040355555555",
+      "roomType": "Suite",
+      "price": 520.0,
+      "quantity": 3,
+      "hotelId": "44444444-4444-4444-8444-444444444444"
+    },
+    {
+      "id": "55555555-5555-4555-8555-050155555555",
+      "roomType": "Single",
+      "price": 230.0,
+      "quantity": 6,
+      "hotelId": "44444444-4444-4444-8444-444444444445"
+    },
+    {
+      "id": "55555555-5555-4555-8555-050255555555",
+      "roomType": "Double",
+      "price": 340.0,
+      "quantity": 10,
+      "hotelId": "44444444-4444-4444-8444-444444444445"
+    },
+    {
+      "id": "55555555-5555-4555-8555-050355555555",
+      "roomType": "Suite",
+      "price": 590.0,
+      "quantity": 3,
+      "hotelId": "44444444-4444-4444-8444-444444444445"
+    },
+    {
+      "id": "55555555-5555-4555-8555-060155555555",
+      "roomType": "Single",
+      "price": 190.0,
+      "quantity": 8,
+      "hotelId": "44444444-4444-4444-8444-444444444446"
+    },
+    {
+      "id": "55555555-5555-4555-8555-060255555555",
+      "roomType": "Double",
+      "price": 280.0,
+      "quantity": 12,
+      "hotelId": "44444444-4444-4444-8444-444444444446"
+    },
+    {
+      "id": "55555555-5555-4555-8555-060355555555",
+      "roomType": "Suite",
+      "price": 460.0,
+      "quantity": 4,
+      "hotelId": "44444444-4444-4444-8444-444444444446"
+    },
+    {
+      "id": "55555555-5555-4555-8555-070155555555",
+      "roomType": "Single",
+      "price": 320.0,
+      "quantity": 10,
+      "hotelId": "44444444-4444-4444-8444-444444444447"
+    },
+    {
+      "id": "55555555-5555-4555-8555-070255555555",
+      "roomType": "Double",
+      "price": 470.0,
+      "quantity": 15,
+      "hotelId": "44444444-4444-4444-8444-444444444447"
+    },
+    {
+      "id": "55555555-5555-4555-8555-070355555555",
+      "roomType": "Suite",
+      "price": 820.0,
+      "quantity": 6,
+      "hotelId": "44444444-4444-4444-8444-444444444447"
+    },
+    {
+      "id": "55555555-5555-4555-8555-080155555555",
+      "roomType": "Single",
+      "price": 260.0,
+      "quantity": 9,
+      "hotelId": "44444444-4444-4444-8444-444444444448"
+    },
+    {
+      "id": "55555555-5555-4555-8555-080255555555",
+      "roomType": "Double",
+      "price": 390.0,
+      "quantity": 14,
+      "hotelId": "44444444-4444-4444-8444-444444444448"
+    },
+    {
+      "id": "55555555-5555-4555-8555-080355555555",
+      "roomType": "Suite",
+      "price": 680.0,
+      "quantity": 5,
+      "hotelId": "44444444-4444-4444-8444-444444444448"
+    }
+  ],
+  "flights": [
+    {
+      "id": "66666666-6666-4666-8666-666666666661",
+      "flightNumber": "AC821",
+      "departureTime": "2026-04-10T18:30:00Z",
+      "arrivalTime": "2026-04-11T06:55:00Z",
+      "duration": 44712.0,
+      "airlineId": "22222222-2222-4222-8222-222222222221",
+      "departureAirportId": "33333333-3333-4333-8333-333333333331",
+      "arrivalAirportId": "33333333-3333-4333-8333-333333333335"
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666662",
+      "flightNumber": "WS702",
+      "departureTime": "2026-04-14T14:00:00Z",
+      "arrivalTime": "2026-04-14T18:55:00Z",
+      "duration": 17712.0,
+      "airlineId": "22222222-2222-4222-8222-222222222223",
+      "departureAirportId": "33333333-3333-4333-8333-333333333333",
+      "arrivalAirportId": "33333333-3333-4333-8333-333333333334"
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666663",
+      "flightNumber": "AF347",
+      "departureTime": "2026-04-18T19:20:00Z",
+      "arrivalTime": "2026-04-19T08:05:00Z",
+      "duration": 45900.0,
+      "airlineId": "22222222-2222-4222-8222-222222222226",
+      "departureAirportId": "33333333-3333-4333-8333-333333333331",
+      "arrivalAirportId": "33333333-3333-4333-8333-333333333335"
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666664",
+      "flightNumber": "BA928",
+      "departureTime": "2026-04-22T20:15:00Z",
+      "arrivalTime": "2026-04-23T07:20:00Z",
+      "duration": 39888.0,
+      "airlineId": "22222222-2222-4222-8222-222222222224",
+      "departureAirportId": "33333333-3333-4333-8333-333333333333",
+      "arrivalAirportId": "33333333-3333-4333-8333-333333333336"
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666665",
+      "flightNumber": "EK244",
+      "departureTime": "2026-04-25T21:10:00Z",
+      "arrivalTime": "2026-04-26T09:55:00Z",
+      "duration": 45900.0,
+      "airlineId": "22222222-2222-4222-8222-222222222225",
+      "departureAirportId": "33333333-3333-4333-8333-333333333331",
+      "arrivalAirportId": "33333333-3333-4333-8333-333333333337"
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "flightNumber": "AC701",
+      "departureTime": "2026-04-27T22:00:00Z",
+      "arrivalTime": "2026-04-28T00:00:00Z",
+      "duration": 7200.0,
+      "airlineId": "22222222-2222-4222-8222-222222222221",
+      "departureAirportId": "33333333-3333-4333-8333-333333333331",
+      "arrivalAirportId": "33333333-3333-4333-8333-333333333338"
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666667",
+      "flightNumber": "VY202",
+      "departureTime": "2026-04-29T15:30:00Z",
+      "arrivalTime": "2026-04-29T22:45:00Z",
+      "duration": 26100.0,
+      "airlineId": "22222222-2222-4222-8222-222222222222",
+      "departureAirportId": "33333333-3333-4333-8333-333333333332",
+      "arrivalAirportId": "33333333-3333-4333-8333-333333333331"
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666668",
+      "flightNumber": "AF1680",
+      "departureTime": "2026-05-02T09:10:00Z",
+      "arrivalTime": "2026-05-02T10:35:00Z",
+      "duration": 5112.0,
+      "airlineId": "22222222-2222-4222-8222-222222222226",
+      "departureAirportId": "33333333-3333-4333-8333-333333333335",
+      "arrivalAirportId": "33333333-3333-4333-8333-333333333336"
+    }
+  ],
+  "cabins": [
+    {
+      "id": "77777777-7777-4777-8777-010177777777",
+      "cabinClass": "Economy",
+      "price": 699.99,
+      "remainingSeats": 42,
+      "flightId": "66666666-6666-4666-8666-666666666661"
+    },
+    {
+      "id": "77777777-7777-4777-8777-010277777777",
+      "cabinClass": "Business",
+      "price": 1499.99,
+      "remainingSeats": 10,
+      "flightId": "66666666-6666-4666-8666-666666666661"
+    },
+    {
+      "id": "77777777-7777-4777-8777-020177777777",
+      "cabinClass": "Economy",
+      "price": 249.99,
+      "remainingSeats": 58,
+      "flightId": "66666666-6666-4666-8666-666666666662"
+    },
+    {
+      "id": "77777777-7777-4777-8777-020277777777",
+      "cabinClass": "Premium Economy",
+      "price": 499.99,
+      "remainingSeats": 18,
+      "flightId": "66666666-6666-4666-8666-666666666662"
+    },
+    {
+      "id": "77777777-7777-4777-8777-030177777777",
+      "cabinClass": "Economy",
+      "price": 799.99,
+      "remainingSeats": 50,
+      "flightId": "66666666-6666-4666-8666-666666666663"
+    },
+    {
+      "id": "77777777-7777-4777-8777-030277777777",
+      "cabinClass": "Business",
+      "price": 1699.99,
+      "remainingSeats": 9,
+      "flightId": "66666666-6666-4666-8666-666666666663"
+    },
+    {
+      "id": "77777777-7777-4777-8777-040177777777",
+      "cabinClass": "Economy",
+      "price": 820.0,
+      "remainingSeats": 37,
+      "flightId": "66666666-6666-4666-8666-666666666664"
+    },
+    {
+      "id": "77777777-7777-4777-8777-040277777777",
+      "cabinClass": "Business",
+      "price": 1720.0,
+      "remainingSeats": 9,
+      "flightId": "66666666-6666-4666-8666-666666666664"
+    },
+    {
+      "id": "77777777-7777-4777-8777-050177777777",
+      "cabinClass": "Economy",
+      "price": 1099.99,
+      "remainingSeats": 44,
+      "flightId": "66666666-6666-4666-8666-666666666665"
+    },
+    {
+      "id": "77777777-7777-4777-8777-050277777777",
+      "cabinClass": "Business",
+      "price": 2499.99,
+      "remainingSeats": 8,
+      "flightId": "66666666-6666-4666-8666-666666666665"
+    },
+    {
+      "id": "77777777-7777-4777-8777-060177777777",
+      "cabinClass": "Economy",
+      "price": 199.99,
+      "remainingSeats": 63,
+      "flightId": "66666666-6666-4666-8666-666666666666"
+    },
+    {
+      "id": "77777777-7777-4777-8777-070177777777",
+      "cabinClass": "Economy",
+      "price": 719.99,
+      "remainingSeats": 40,
+      "flightId": "66666666-6666-4666-8666-666666666667"
+    },
+    {
+      "id": "77777777-7777-4777-8777-070277777777",
+      "cabinClass": "Business",
+      "price": 1520.0,
+      "remainingSeats": 12,
+      "flightId": "66666666-6666-4666-8666-666666666667"
+    },
+    {
+      "id": "77777777-7777-4777-8777-080177777777",
+      "cabinClass": "Economy",
+      "price": 189.99,
+      "remainingSeats": 72,
+      "flightId": "66666666-6666-4666-8666-666666666668"
+    },
+    {
+      "id": "77777777-7777-4777-8777-080277777777",
+      "cabinClass": "Business",
+      "price": 389.99,
+      "remainingSeats": 16,
+      "flightId": "66666666-6666-4666-8666-666666666668"
+    }
+  ]
+}
