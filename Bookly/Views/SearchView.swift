@@ -40,6 +40,17 @@ struct SearchView: View {
                     }
                     .buttonStyle(.plain)
                 }
+                
+                Button {
+                    vm.openMapSearch()
+                } label: {
+                    searchCategoryCard(
+                        title: "Use a Map",
+                        subtitle: "Browse destinations, hotels, and airports on a map.",
+                        icon: "map"
+                    )
+                }
+                .buttonStyle(.plain)
             }
             .padding()
         }
@@ -58,11 +69,38 @@ struct SearchView: View {
                     vm.showFlightResults(request: request)
                 }
                 
+            case .mapSearch:
+                DestinationMapBrowseView(
+                    mode: .hotel,
+                    onPrimaryAction: { destination, contentType, mode in
+                        vm.handleMapPrimaryAction(
+                            destination: destination,
+                            contentType: contentType,
+                            mode: mode
+                        )
+                    },
+                    onHotelPicked: { hotel in
+                        vm.showHotelDetails(hotel)
+                    },
+                    onAirportPicked: { airport, mode in
+                        vm.handleAirportPicked(
+                            airport: airport,
+                            mode: mode
+                        )
+                    }
+                )
+                
             case .hotelResults(let request):
                 HotelsResultsView(request: request)
                 
             case .flightResults(let request):
                 FlightsResultsView(request: request)
+                
+            case .hotelDetails(let hotel, let request):
+                HotelDetailsView(
+                    hotel: hotel,
+                    request: request
+                )
             }
         }
     }
@@ -100,6 +138,7 @@ struct SearchView: View {
             
             HStack {
                 Spacer()
+                
                 Image(systemName: "arrow.right")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color("PrimaryColor"))
@@ -115,7 +154,4 @@ struct SearchView: View {
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.08), radius: 12, y: 6)
     }
-}
-#Preview {
-    SearchView()
 }
