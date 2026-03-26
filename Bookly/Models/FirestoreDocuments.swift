@@ -11,6 +11,8 @@ struct DestinationDocument: Codable {
     let id: String
     let city: String
     let country: String
+    let latitude: Double?
+    let longitude: Double?
 }
 
 struct AirlineDocument: Codable {

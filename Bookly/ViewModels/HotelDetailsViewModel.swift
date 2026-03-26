@@ -24,8 +24,9 @@ final class HotelDetailsViewModel: ObservableObject {
         self.hotel = hotel
         self.checkInDate = checkInDate
         self.checkOutDate = checkOutDate
-    }
 
+    }
+    
     var name: String {
         hotel.name ?? "Unknown Hotel"
     }

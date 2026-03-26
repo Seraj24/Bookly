@@ -71,21 +71,24 @@ struct SearchView: View {
                 
             case .mapSearch:
                 DestinationMapBrowseView(
-                    mode: .hotel,
-                    onPrimaryAction: { destination, contentType, mode in
-                        vm.handleMapPrimaryAction(
+                    onShowHotels: { destination, checkInDate, checkOutDate in
+                        vm.showHotelsFromMap(
                             destination: destination,
-                            contentType: contentType,
-                            mode: mode
+                            checkInDate: checkInDate,
+                            checkOutDate: checkOutDate
                         )
                     },
-                    onHotelPicked: { hotel in
-                        vm.showHotelDetails(hotel)
+                    onShowFlights: { departureAirport, arrivalAirport in
+                        vm.showFlightsFromMap(
+                            departureAirport: departureAirport,
+                            arrivalAirport: arrivalAirport
+                        )
                     },
-                    onAirportPicked: { airport, mode in
-                        vm.handleAirportPicked(
-                            airport: airport,
-                            mode: mode
+                    onHotelPicked: { hotel, checkInDate, checkOutDate in
+                        vm.showHotelDetails(
+                            hotel,
+                            checkInDate: checkInDate,
+                            checkOutDate: checkOutDate
                         )
                     }
                 )

@@ -11,6 +11,8 @@ struct DestinationSeed: Codable {
     let id: UUID
     let city: String
     let country: String
+    let latitude: Double
+    let longitude: Double
 }
 
 struct AirlineSeed: Codable {

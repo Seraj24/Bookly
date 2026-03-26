@@ -14,7 +14,6 @@ enum ActiveField {
     case hotelDestination
 }
 
-// Since I haven't implemented the map yet, this view acts as the home view for this iteration
 struct HomeView: View {
     
     @EnvironmentObject private var holder: BooklyHolder

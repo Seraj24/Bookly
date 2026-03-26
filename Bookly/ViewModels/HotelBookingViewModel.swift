@@ -28,6 +28,8 @@ final class HotelBookingViewModel: ObservableObject {
     
     init(selection: HotelBookingSelection) {
         self.selection = selection
+        checkInDate = selection.checkIn
+        checkOutDate = selection.checkOut
     }
     
     var hotelName: String {

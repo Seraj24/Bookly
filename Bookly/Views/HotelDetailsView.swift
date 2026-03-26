@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct HotelDetailsView: View {
-
+    
+    @Environment(\.dismiss) private var dismiss
+    
     @StateObject private var vm: HotelDetailsViewModel
     @ObservedObject private var auth = AuthService.shared
-    
+
     init(hotel: Hotel, request: HotelSearchRequest) {
         _vm = StateObject(
             wrappedValue: HotelDetailsViewModel(
@@ -45,18 +47,63 @@ struct HotelDetailsView: View {
             vm.refreshAuthState()
         }
     }
-
+    
     private var headerImage: some View {
-        RoundedRectangle(cornerRadius: 20)
-            .fill(Color(.systemGray5))
-            .frame(height: 220)
-            .overlay {
-                Image(systemName: "building.2.crop.circle")
-                    .font(.system(size: 42))
-                    .foregroundStyle(.secondary)
+        Group {
+            if let urlString = vm.hotel.photoURL,
+               let url = URL(string: urlString) {
+                
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        ZStack {
+                            Color(.systemGray5)
+                            ProgressView()
+                        }
+                        
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                        
+                    case .failure(let error):
+                        ZStack {
+                            Color(.systemGray5)
+                            VStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle")
+                                    .font(.title2)
+                                Text("Failed to load image")
+                                    .font(.caption)
+                                Text(error.localizedDescription)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .padding()
+                        }
+                        
+                    @unknown default:
+                        fallbackImage
+                    }
+                }
+            } else {
+                fallbackImage
             }
+        }
+        .frame(height: 220)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
     }
+    
+    private var fallbackImage: some View {
+        ZStack {
+            Color(.systemGray5)
 
+            Image(systemName: "building.2.crop.circle")
+                .font(.system(size: 42))
+                .foregroundStyle(.secondary)
+        }
+    }
+    
     private var summaryCard: some View {
         VStack(alignment: .leading, spacing: 12) {
 

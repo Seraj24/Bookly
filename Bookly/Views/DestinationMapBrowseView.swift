@@ -8,28 +8,17 @@
 import SwiftUI
 import MapKit
 import CoreLocation
+import CoreData
 
 struct DestinationMapBrowseView: View {
     
     @EnvironmentObject private var holder: BooklyHolder
     @StateObject private var locationManager = LocationManager()
-    @StateObject private var vm: DestinationMapBrowseViewModel
+    @StateObject private var vm = DestinationMapBrowseViewModel()
     
-    let onPrimaryAction: (Destination, DestinationBrowseContentType, DestinationBrowseMode) -> Void
-    let onHotelPicked: (Hotel) -> Void
-    let onAirportPicked: (Airport, DestinationBrowseMode) -> Void
-    
-    init(
-        mode: DestinationBrowseMode,
-        onPrimaryAction: @escaping (Destination, DestinationBrowseContentType, DestinationBrowseMode) -> Void,
-        onHotelPicked: @escaping (Hotel) -> Void,
-        onAirportPicked: @escaping (Airport, DestinationBrowseMode) -> Void
-    ) {
-        _vm = StateObject(wrappedValue: DestinationMapBrowseViewModel(mode: mode))
-        self.onPrimaryAction = onPrimaryAction
-        self.onHotelPicked = onHotelPicked
-        self.onAirportPicked = onAirportPicked
-    }
+    let onShowHotels: (Destination, Date, Date) -> Void
+    let onShowFlights: (Airport, Airport) -> Void
+    let onHotelPicked: (Hotel, Date, Date) -> Void
     
     private var filteredDestinations: [Destination] {
         vm.filteredDestinations(from: holder.destinations)
@@ -48,16 +37,12 @@ struct DestinationMapBrowseView: View {
             return nil
         }
         
-        return vm.coordinate(
-            for: selectedDestination,
-            hotels: holder.hotels,
-            airports: holder.airports
-        )
+        return previewCoordinate(for: selectedDestination)
     }
     
     var body: some View {
         ZStack {
-            mapView
+            mapSection
             
             VStack {
                 HStack {
@@ -75,6 +60,7 @@ struct DestinationMapBrowseView: View {
                             .background(.ultraThinMaterial)
                             .clipShape(Circle())
                     }
+                    .buttonStyle(.plain)
                     .shadow(radius: 4)
                     .padding()
                 }
@@ -101,6 +87,7 @@ struct DestinationMapBrowseView: View {
                                 .background(.ultraThinMaterial)
                                 .clipShape(Circle())
                         }
+                        .buttonStyle(.plain)
                         .shadow(radius: 4)
                         
                         Button {
@@ -115,6 +102,7 @@ struct DestinationMapBrowseView: View {
                                 .background(.ultraThinMaterial)
                                 .clipShape(Circle())
                         }
+                        .buttonStyle(.plain)
                         .shadow(radius: 4)
                     }
                     .padding()
@@ -134,7 +122,7 @@ struct DestinationMapBrowseView: View {
         }
     }
     
-    private var mapView: some View {
+    private var mapSection: some View {
         Map(position: $vm.camera) {
             
             if let userLocation = locationManager.userLocation {
@@ -142,19 +130,15 @@ struct DestinationMapBrowseView: View {
                     .tint(.blue)
             }
             
-            /* To show a red marker on a city/destination but the current database and CoreData model does not support cooridinations on the model Destination
-             
-             ForEach(filteredDestinations, id: \.objectID) { destination in
-                 if let coordinate = vm.destinationCoordinate(for: destination) {
-                     Marker(
-                         destination.city ?? "Destination",
-                         coordinate: coordinate
-                     )
-                     .tint(.red)
-                 }
-             }
-             */
-            
+            ForEach(filteredDestinations, id: \.objectID) { destination in
+                if let coordinate = previewCoordinate(for: destination) {
+                    Marker(
+                        "\(destination.city ?? ""), \(destination.country ?? "")",
+                        coordinate: coordinate
+                    )
+                    .tint(.red)
+                }
+            }
             
             if vm.selectedContentType == .hotels {
                 ForEach(visibleHotels, id: \.objectID) { hotel in
@@ -166,7 +150,7 @@ struct DestinationMapBrowseView: View {
                         )
                     ) {
                         Button {
-                            onHotelPicked(hotel)
+                            onHotelPicked(hotel, vm.checkInDate, vm.checkOutDate)
                         } label: {
                             Image(systemName: "bed.double.fill")
                                 .foregroundStyle(.white)
@@ -174,6 +158,7 @@ struct DestinationMapBrowseView: View {
                                 .background(.green)
                                 .clipShape(Circle())
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             } else {
@@ -186,14 +171,15 @@ struct DestinationMapBrowseView: View {
                         )
                     ) {
                         Button {
-                            onAirportPicked(airport, vm.mode)
+                            vm.selectAirport(airport)
                         } label: {
                             Image(systemName: "airplane")
                                 .foregroundStyle(.white)
                                 .padding(8)
-                                .background(.orange)
+                                .background(airportSelectionColor(for: airport))
                                 .clipShape(Circle())
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -203,43 +189,147 @@ struct DestinationMapBrowseView: View {
     
     private var bottomPanel: some View {
         VStack(spacing: 12) {
-            HStack(spacing: 10) {
-                TextField(vm.searchPlaceholder, text: $vm.searchText)
-                    .textFieldStyle(.roundedBorder)
-                    .submitLabel(.search)
+            searchSection
+            contentPickerSection
+            
+            if vm.selectedContentType == .hotels {
+                hotelDatesSection
+            } else {
+                airportStepSection
+            }
+            
+            destinationSelectionSection
+            
+            if let selectedDestination = vm.selectedDestination {
+                selectedDestinationCard(for: selectedDestination)
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+    }
+    
+    private var searchSection: some View {
+        HStack(spacing: 10) {
+            TextField(vm.searchPlaceholder, text: $vm.searchText)
+                .textFieldStyle(.roundedBorder)
+                .submitLabel(.search)
+            
+            Button {
+                guard let first = filteredDestinations.first else { return }
                 
-                Button {
-                    guard let first = filteredDestinations.first else { return }
-                    
-                    vm.selectDestination(first)
-                    
-                    if let coordinate = vm.coordinate(
-                        for: first,
-                        hotels: holder.hotels,
-                        airports: holder.airports
-                    ) {
-                        withAnimation {
-                            vm.focusOnCoordinate(coordinate)
-                        }
+                vm.selectDestination(first)
+                
+                if let coordinate = previewCoordinate(for: first) {
+                    withAnimation {
+                        vm.focusOnCoordinate(coordinate)
                     }
+                }
+            } label: {
+                Image(systemName: "magnifyingglass")
+                    .tint(.white)
+                    .frame(width: 24, height: 24)
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 14)
+                    .background(.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            .buttonStyle(.plain)
+            .disabled(vm.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        }
+    }
+    
+    private var contentPickerSection: some View {
+        Picker("Content Type", selection: $vm.selectedContentType) {
+            Text("Hotels").tag(DestinationBrowseContentType.hotels)
+            Text("Airports").tag(DestinationBrowseContentType.airports)
+        }
+        .pickerStyle(.segmented)
+    }
+    
+    private var hotelDatesSection: some View {
+        VStack(spacing: 10) {
+            DatePicker(
+                "Check-in",
+                selection: $vm.checkInDate,
+                displayedComponents: .date
+            )
+            .datePickerStyle(.compact)
+            
+            DatePicker(
+                "Check-out",
+                selection: $vm.checkOutDate,
+                in: vm.checkInDate...,
+                displayedComponents: .date
+            )
+            .datePickerStyle(.compact)
+        }
+        .onChange(of: vm.checkInDate) { _, _ in
+            vm.normalizeDatesIfNeeded()
+        }
+    }
+    
+    private var airportStepSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Button {
+                    vm.chooseDepartureStep()
                 } label: {
-                    Image(systemName: "magnifyingglass")
-                        .tint(.white)
-                        .frame(width: 24, height: 24)
+                    Text("Departure")
+                        .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
-                        .padding(.horizontal, 14)
-                        .background(.blue)
+                        .background(
+                            vm.flightSelectionStep == .departure
+                            ? Color.blue
+                            : Color(.systemGray5)
+                        )
+                        .foregroundStyle(
+                            vm.flightSelectionStep == .departure
+                            ? Color.white
+                            : Color.primary
+                        )
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
-                .disabled(vm.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .buttonStyle(.plain)
+                
+                Button {
+                    vm.chooseArrivalStep()
+                } label: {
+                    Text("Arrival")
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(
+                            vm.flightSelectionStep == .arrival
+                            ? Color.blue
+                            : Color(.systemGray5)
+                        )
+                        .foregroundStyle(
+                            vm.flightSelectionStep == .arrival
+                            ? Color.white
+                            : Color.primary
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                .buttonStyle(.plain)
             }
             
-            Picker("Content Type", selection: $vm.selectedContentType) {
-                Text("Hotels").tag(DestinationBrowseContentType.hotels)
-                Text("Airports").tag(DestinationBrowseContentType.airports)
-            }
-            .pickerStyle(.segmented)
+            Text(vm.flightSelectionPrompt)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
             
+            if let departure = vm.selectedDepartureAirport {
+                Text("Departure: \(vm.airportDisplayText(departure))")
+                    .font(.subheadline)
+            }
+            
+            if let arrival = vm.selectedArrivalAirport {
+                Text("Arrival: \(vm.airportDisplayText(arrival))")
+                    .font(.subheadline)
+            }
+        }
+    }
+    
+    private var destinationSelectionSection: some View {
+        Group {
             if !filteredDestinations.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
@@ -247,11 +337,7 @@ struct DestinationMapBrowseView: View {
                             Button {
                                 vm.selectDestination(destination)
                                 
-                                if let coordinate = vm.coordinate(
-                                    for: destination,
-                                    hotels: holder.hotels,
-                                    airports: holder.airports
-                                ) {
+                                if let coordinate = previewCoordinate(for: destination) {
                                     withAnimation {
                                         vm.focusOnCoordinate(coordinate)
                                     }
@@ -274,40 +360,51 @@ struct DestinationMapBrowseView: View {
                     }
                 }
             }
-            
-            if let selectedDestination = vm.selectedDestination {
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(selectedDestination.city ?? "Unknown City")
-                                .font(.headline)
-                            
-                            Text(selectedDestination.country ?? "Unknown Country")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                        
-                        Spacer()
-                        
-                        Button(vm.primaryActionTitle) {
-                            onPrimaryAction(selectedDestination, vm.selectedContentType, vm.mode)
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
+        }
+    }
+    
+    private func selectedDestinationCard(for destination: Destination) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(destination.city ?? "Unknown City")
+                        .font(.headline)
                     
-                    if vm.selectedContentType == .hotels {
-                        hotelsPreviewSection
-                    } else {
-                        airportsPreviewSection
-                    }
+                    Text(destination.country ?? "Unknown Country")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
-                .padding()
-                .background(.primary)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
+                
+                Spacer()
+                
+                if vm.selectedContentType == .hotels {
+                    Button("Show Hotels") {
+                        onShowHotels(destination, vm.checkInDate, vm.checkOutDate)
+                    }
+                    .buttonStyle(.borderedProminent)
+                } else {
+                    Button("Show Flights") {
+                        guard let departure = vm.selectedDepartureAirport,
+                              let arrival = vm.selectedArrivalAirport else {
+                            return
+                        }
+                        
+                        onShowFlights(departure, arrival)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!vm.canShowFlights)
+                }
+            }
+            
+            if vm.selectedContentType == .hotels {
+                hotelsPreviewSection
+            } else {
+                airportsPreviewSection
             }
         }
         .padding()
-        .background(.ultraThinMaterial)
+        .background(.primary)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
     
     private var hotelsPreviewSection: some View {
@@ -322,13 +419,15 @@ struct DestinationMapBrowseView: View {
             } else {
                 ForEach(visibleHotels.prefix(3), id: \.objectID) { hotel in
                     Button {
-                        onHotelPicked(hotel)
+                        onHotelPicked(hotel, vm.checkInDate, vm.checkOutDate)
                     } label: {
                         HStack {
                             Text(hotel.name ?? "Unnamed Hotel")
                                 .font(.subheadline)
                                 .foregroundStyle(.primary)
+                            
                             Spacer()
+                            
                             Image(systemName: "chevron.right")
                                 .foregroundStyle(.secondary)
                         }
@@ -351,15 +450,16 @@ struct DestinationMapBrowseView: View {
             } else {
                 ForEach(visibleAirports.prefix(3), id: \.objectID) { airport in
                     Button {
-                        onAirportPicked(airport, vm.mode)
+                        vm.selectAirport(airport)
                     } label: {
                         HStack {
-                            Text("\(airport.name ?? "Unnamed Airport") (\(airport.code ?? ""))")
+                            Text(vm.airportDisplayText(airport))
                                 .font(.subheadline)
                                 .foregroundStyle(.primary)
+                            
                             Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(.secondary)
+                            
+                            airportSelectionLabel(for: airport)
                         }
                     }
                     .buttonStyle(.plain)
@@ -367,4 +467,52 @@ struct DestinationMapBrowseView: View {
             }
         }
     }
+    
+    private func previewCoordinate(for destination: Destination) -> CLLocationCoordinate2D? {
+        if let hotel = vm.getHotels(for: destination, from: holder.hotels).first {
+            return CLLocationCoordinate2D(
+                latitude: hotel.latitude,
+                longitude: hotel.longitude
+            )
+        }
+        
+        if let airport = vm.getAirports(for: destination, from: holder.airports).first {
+            return CLLocationCoordinate2D(
+                latitude: airport.latitude,
+                longitude: airport.longitude
+            )
+        }
+        
+        return nil
+    }
+    
+    private func airportSelectionColor(for airport: Airport) -> Color {
+        if vm.selectedDepartureAirport?.objectID == airport.objectID {
+            return .blue
+        }
+        
+        if vm.selectedArrivalAirport?.objectID == airport.objectID {
+            return .purple
+        }
+        
+        return .orange
+    }
+    
+    @ViewBuilder
+    private func airportSelectionLabel(for airport: Airport) -> some View {
+        if vm.selectedDepartureAirport?.objectID == airport.objectID {
+            Text("Departure")
+                .font(.caption)
+                .foregroundStyle(.blue)
+        } else if vm.selectedArrivalAirport?.objectID == airport.objectID {
+            Text("Arrival")
+                .font(.caption)
+                .foregroundStyle(.purple)
+        } else {
+            Image(systemName: "chevron.right")
+                .foregroundStyle(.secondary)
+        }
+    }
 }
+
+

@@ -98,7 +98,9 @@ final class FirestoreBootstrapService {
             let doc = DestinationDocument(
                 id: item.id.uuidString,
                 city: item.city,
-                country: item.country
+                country: item.country,
+                latitude: item.latitude,
+                longitude: item.longitude
             )
 
             let ref = db.collection("destinations").document(doc.id)
