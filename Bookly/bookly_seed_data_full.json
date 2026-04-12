@@ -86,7 +86,7 @@
   "airports": [
     {
       "id": "33333333-3333-4333-8333-333333333331",
-      "name": "Montr\u00e9al\u2013Trudeau International Airport",
+      "name": "Montreal Trudeau International Airport",
       "code": "YUL",
       "destinationId": "11111111-1111-4111-8111-111111111111",
       "latitude": 45.4706,
@@ -94,7 +94,7 @@
     },
     {
       "id": "33333333-3333-4333-8333-333333333332",
-      "name": "Barcelona\u2013El Prat Airport",
+      "name": "Barcelona Prat Airport",
       "code": "BCN",
       "destinationId": "11111111-1111-4111-8111-111111111112",
       "latitude": 41.2974,
@@ -215,7 +215,7 @@
       "destinationId": "11111111-1111-4111-8111-111111111112",
       "latitude": 41.3854,
       "longitude": 2.1967,
-      "photoURL": "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg"
+      "photoURL": "https://images.pexels.com/photos/1388030/pexels-photo-1388030.jpeg?auto=compress&cs=tinysrgb&w=800"
     },
     {
       "id": "44444444-4444-4444-8444-444444444453",
@@ -316,7 +316,7 @@
       "destinationId": "11111111-1111-4111-8111-111111111114",
       "latitude": 49.2886,
       "longitude": -123.111,
-      "photoURL": "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg"
+      "photoURL": "https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=800"
     },
     {
       "id": "44444444-4444-4444-8444-444444444460",

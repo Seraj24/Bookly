@@ -71,6 +71,7 @@ struct SearchView: View {
                 
             case .mapSearch:
                 DestinationMapBrowseView(
+                    preselectedDestination: nil,
                     onShowHotels: { destination, checkInDate, checkOutDate in
                         vm.showHotelsFromMap(
                             destination: destination,

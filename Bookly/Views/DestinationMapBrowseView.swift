@@ -16,6 +16,7 @@ struct DestinationMapBrowseView: View {
     @StateObject private var locationManager = LocationManager()
     @StateObject private var vm = DestinationMapBrowseViewModel()
     
+    let preselectedDestination: Destination?
     let onShowHotels: (Destination, Date, Date) -> Void
     let onShowFlights: (Airport, Airport) -> Void
     let onHotelPicked: (Hotel, Date, Date) -> Void
@@ -116,6 +117,14 @@ struct DestinationMapBrowseView: View {
         }
         .onAppear {
             vm.setupInitialCamera(userLocation: locationManager.userLocation)
+            
+            if let preselectedDestination {
+                vm.selectDestination(preselectedDestination)
+                
+                if let coordinate = previewCoordinate(for: preselectedDestination) {
+                    vm.focusOnCoordinate(coordinate)
+                }
+            }
         }
         .onReceive(locationManager.$userLocation) { newValue in
             vm.setupInitialCamera(userLocation: newValue)

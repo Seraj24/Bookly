@@ -56,7 +56,8 @@ struct HomeView: View {
                     }
                 }
                 
-                featuredSection
+                destinationsSection
+                popularHotelsSection
             }
             .padding()
         }
@@ -72,6 +73,43 @@ struct HomeView: View {
                 HotelsResultsView(request: request)
             case .flights(let request):
                 FlightsResultsView(request: request)
+            case .hotelDetails(let hotel, let request):
+                    HotelDetailsView(hotel: hotel, request: request)
+            case .destinationMap(let selectedDestination):
+                DestinationMapBrowseView(
+                    preselectedDestination: selectedDestination,
+                    onShowHotels: { destination, checkIn, checkOut in
+                        vm.showHotels(
+                            request: HotelSearchRequest(
+                                destination: destination.city ?? "",
+                                checkInDate: checkIn,
+                                checkOutDate: checkOut
+                            )
+                        )
+                    },
+                    onShowFlights: { departure, arrival in
+                        vm.showFlights(
+                            request: FlightSearchRequest(
+                                fromCity: departure.destination?.city ?? "",
+                                toCity: arrival.destination?.city ?? "",
+                                departureDate: Date(),
+                                returnDate: nil,
+                                tripType: .oneWay
+                            )
+                        )
+                    },
+                    onHotelPicked: { hotel, checkIn, checkOut in
+                        vm.route = .hotelDetails(
+                            hotel: hotel,
+                            request: HotelSearchRequest(
+                                destination: hotel.destination?.city ?? "",
+                                checkInDate: checkIn,
+                                checkOutDate: checkOut
+                            )
+                        )
+                    }
+                )
+                
             case .account:
                 AccountView()
             }
@@ -84,7 +122,7 @@ struct HomeView: View {
                 .font(.title2)
                 .fontWeight(.bold)
             
-            Text("Search deals on hotels, flights, and more")
+            Text("Discover destinations, hotels, flights, and more")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -107,23 +145,64 @@ struct HomeView: View {
         }
     }
     
-    private var featuredSection: some View {
+    private var destinationsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Featured Deals")
+                Text("Destinations")
                     .font(.headline)
                 
                 Spacer()
                 
-                Button("See all") { }
-                    .font(.subheadline)
-                    .foregroundStyle(Color("PrimaryColor"))
+                Button("See all") {
+                    vm.showDestinationMap()
+                }
+                .font(.subheadline)
+                .foregroundStyle(Color("PrimaryColor"))
             }
             
-            VStack(spacing: 12) {
-                ForEach(vm.deals) { deal in
-                    DealCard(deal: deal)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 14) {
+                    ForEach(vm.destinations) { destination in
+                        Button {
+                            vm.showDestinationOnMap(destination.destination)
+                        } label: {
+                            DestinationCard(item: destination)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
+                .padding(.vertical, 4)
+            }
+        }
+    }
+    
+    private var popularHotelsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Popular Hotels")
+                    .font(.headline)
+                
+                Spacer()
+                
+                Button("See all") {
+                    vm.showDestinationMap()
+                }
+                .font(.subheadline)
+                .foregroundStyle(Color("PrimaryColor"))
+            }
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 14) {
+                    ForEach(vm.popularHotels) { hotel in
+                        Button {
+                            vm.showHotelDetails(hotel.hotel)
+                        } label: {
+                            PopularHotelCard(item: hotel)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.vertical, 4)
             }
         }
     }
@@ -132,6 +211,8 @@ struct HomeView: View {
 enum HomeRoute: Hashable, Identifiable {
     case hotels(request: HotelSearchRequest)
     case flights(request: FlightSearchRequest)
+    case hotelDetails(hotel: Hotel, request: HotelSearchRequest)
+    case destinationMap(selectedDestination: Destination?)
     case account
     
     var id: Self { self }
